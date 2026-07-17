@@ -33,95 +33,97 @@ const panelMeta: Record<ActivePanel, { label: string; title: string }> = {
   },
 };
 
-const profileRows = [
-  "Web Developer",
-  "Modern Websites",
-  "Responsive Design",
-  "AI-ready Lösungen",
-  "Local Business Germany",
+const brandFacts = [
+  ["01", "Design", "Ruhige visuelle Systeme, die Vertrauen schaffen."],
+  ["02", "Development", "Saubere Umsetzung mit Fokus auf Geschwindigkeit."],
+  ["03", "AI-ready", "Moderne Funktionen, wenn sie dem Projekt wirklich helfen."],
 ];
 
 const services = [
   {
-    title: "Handwerker-Websites",
+    title: "Websites für lokale Unternehmen",
     description:
-      "Für Maler, Elektriker, Sanitärbetriebe, Bodenleger und andere Fachbetriebe.",
+      "Klar strukturierte Auftritte für Handwerk, Bau, Küchenstudios, Restaurants, Beauty und lokale Services.",
   },
   {
-    title: "Bauunternehmen",
+    title: "Responsive Design",
     description:
-      "Professionelle Online-Auftritte für Bau, Renovierung, Innenausbau und lokale Projekte.",
+      "Layouts, die auf Desktop, iPhone und Android hochwertig wirken und ohne Reibung bedienbar bleiben.",
   },
   {
-    title: "Küchenstudios",
+    title: "Digitale Kundenanfragen",
     description:
-      "Moderne Websites für Küchenstudios, Arbeitsplatten, Möbelbau und Einrichtung.",
+      "Kontaktwege, klare Nutzerführung und Inhalte, die Besuchern den nächsten Schritt einfach machen.",
   },
   {
-    title: "Restaurants & Cafés",
+    title: "AI-ready Lösungen",
     description:
-      "Klare Websites mit Speisekarte, Öffnungszeiten, Reservierung und Kontaktmöglichkeiten.",
-  },
-  {
-    title: "Salons & Beauty",
-    description:
-      "Websites für Friseure, Kosmetikstudios, Nagelstudios und lokale Beauty-Angebote.",
-  },
-  {
-    title: "Autowerkstätten",
-    description:
-      "Websites für Werkstätten, Fahrzeugpflege, Reifenservice und lokale Auto-Services.",
-  },
-  {
-    title: "Lokale Dienstleistungen",
-    description:
-      "Für Reinigungsdienste, Hausmeisterservice, Umzüge, Reparaturen und weitere lokale Anbieter.",
-  },
-  {
-    title: "Individuelle Projekte",
-    description:
-      "Spezielle digitale Lösungen, Landingpages, Portfolio-Seiten und AI-gestützte Funktionen.",
+      "Upload-Flows, Visualisierungskonzepte, Landingpages und digitale Funktionen, die erweiterbar bleiben.",
   },
 ];
 
-const steinOutletBullets = [
-  "Premium Website für Küchen & Arbeitsplatten",
-  "Upload-Flow für Küchenfotos",
-  "Materialauswahl für Naturstein, Keramik und Quarzkomposit",
-  "AI-ready Visualisierungskonzept",
-  "Responsive Design für Desktop, iPhone und Android",
+const serviceTypes = [
+  "Handwerker",
+  "Bauunternehmen",
+  "Küchenstudios",
+  "Restaurants & Cafés",
+  "Salons & Beauty",
+  "Autowerkstätten",
+  "Lokale Dienstleistungen",
+  "Individuelle Projekte",
 ];
 
-const steinOutletTags = [
-  "Next.js",
-  "TypeScript",
-  "AI-ready",
-  "Responsive Design",
-  "Kitchen Studio",
-  "Local Business",
+const caseStudies = [
+  {
+    index: "01",
+    title: "STEINOutlet",
+    subtitle: "AI Kitchen Visualization Platform",
+    url: "",
+    description:
+      "Eine moderne digitale Plattform für Küchenarbeitsplatten mit AI-gestützter Visualisierung. Nutzer können ein Küchenfoto hochladen, Materialien auswählen und eine neue Arbeitsplatte digital erleben.",
+    results: [
+      "Premium Website für Küchen & Arbeitsplatten",
+      "Upload-Flow für Küchenfotos",
+      "Materialauswahl für Naturstein, Keramik und Quarzkomposit",
+      "AI-ready Visualisierungskonzept",
+      "Responsive Design für Desktop, iPhone und Android",
+    ],
+    tags: [
+      "Next.js",
+      "TypeScript",
+      "AI-ready",
+      "Responsive Design",
+      "Kitchen Studio",
+      "Local Business",
+    ],
+  },
+  {
+    index: "02",
+    title: "AURA",
+    subtitle: "Premium Nail Studio Landing Page",
+    url: "https://aura-landing-two-zeta.vercel.app",
+    description:
+      "Dark elegant landing page for a nail studio with video hero, multilingual structure, booking CTA and mobile-first layout.",
+    results: [
+      "Video hero with dark elegant atmosphere",
+      "Multilingual structure for studio visitors",
+      "Booking CTA and mobile-first layout",
+    ],
+    tags: [
+      "HTML",
+      "CSS",
+      "JavaScript",
+      "Vercel",
+      "Beauty Studio",
+      "Responsive Design",
+    ],
+  },
 ];
 
-const materialChips = ["Naturstein", "Keramik", "Quarzkomposit"];
-const previewStatus = ["Responsive", "Mobile ready", "AI-ready"];
-const contactHighlights = [
-  "Germany",
-  "Websites für lokale Unternehmen",
-  "Responsive Design",
-  "AI-ready Lösungen",
-];
-const contactRows = [
-  {
-    label: "Start",
-    value: "Kurzes Erstgespräch",
-  },
-  {
-    label: "Fokus",
-    value: "Klare Website, mehr Vertrauen, mehr Anfragen",
-  },
-  {
-    label: "Umsetzung",
-    value: "Design, Entwicklung, Veröffentlichung",
-  },
+const contactNotes = [
+  ["Start", "Kurzes Erstgespräch"],
+  ["Fokus", "Klare Website, mehr Vertrauen, mehr Anfragen"],
+  ["Umsetzung", "Design, Entwicklung, Veröffentlichung"],
 ];
 
 export function ContentPanel({
@@ -152,24 +154,24 @@ export function ContentPanel({
         onClick={onClose}
       />
 
-      <section className="content-panel relative max-h-[86vh] w-full max-w-[1080px] overflow-hidden rounded-[2rem] border border-white/[0.08] bg-[radial-gradient(circle_at_50%_0%,rgba(125,226,255,0.1),transparent_42%),linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.025)),rgba(5,10,16,0.76)] shadow-[0_28px_110px_rgba(0,0,0,0.48),0_0_70px_rgba(48,213,255,0.12),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-2xl sm:rounded-[2.4rem]">
+      <section className="content-panel relative max-h-[88vh] w-full max-w-[1180px] overflow-hidden rounded-[2.2rem] border border-[#d89b3a]/18 bg-[linear-gradient(145deg,rgba(255,255,255,0.055),rgba(12,12,12,0.18)_38%,rgba(0,0,0,0.24)),rgba(5,6,8,0.18)] shadow-[0_38px_130px_rgba(0,0,0,0.46),0_0_90px_rgba(216,155,58,0.05),inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-[3px] sm:rounded-[2.8rem]">
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(125,226,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(125,226,255,0.026)_1px,transparent_1px)] bg-[size:54px_54px] opacity-45"
+          className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-[#d89b3a]/42 to-transparent"
         />
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-cyan-200/[0.055] blur-3xl"
+          className="pointer-events-none absolute -right-24 -top-28 h-80 w-80 rounded-full bg-[#d89b3a]/[0.025] blur-3xl"
         />
 
-        <div className="relative flex items-start justify-between gap-4 border-b border-white/[0.07] px-5 py-5 sm:px-7">
-          <div>
-            <p className="font-mono text-xs font-semibold uppercase tracking-[0.24em] text-cyan-100/60">
+        <div className="relative flex items-start justify-between gap-5 px-6 pb-5 pt-7 sm:px-9 sm:pt-9 lg:px-12">
+          <div className="max-w-4xl">
+            <p className="font-mono text-xs font-semibold uppercase tracking-[0.28em] text-[#d89b3a]/72">
               {meta.label}
             </p>
             <h2
               id="content-panel-title"
-              className="mt-2 max-w-3xl text-3xl font-semibold tracking-[-0.04em] text-slate-50 sm:text-4xl"
+              className="mt-4 text-[clamp(2.1rem,5vw,4.75rem)] font-semibold leading-[0.98] tracking-[-0.055em] text-[#f8f5ee]"
             >
               {meta.title}
             </h2>
@@ -178,14 +180,14 @@ export function ContentPanel({
           <button
             type="button"
             onClick={onClose}
-            className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-white/12 bg-white/[0.04] text-xl leading-none text-slate-200 transition hover:-translate-y-0.5 hover:border-cyan-200/28 hover:bg-cyan-100/[0.06] hover:text-cyan-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-cyan-300/25"
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-[#d89b3a]/22 bg-black/15 text-xl leading-none text-[#f8f5ee]/82 transition hover:-translate-y-0.5 hover:border-[#d89b3a]/42 hover:bg-[#d89b3a]/[0.07] hover:text-[#f3d38a] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#d89b3a]/25"
             aria-label="Panel schließen"
           >
             ×
           </button>
         </div>
 
-        <div className="relative max-h-[calc(86vh-7.5rem)] overflow-y-auto px-5 py-6 sm:px-7 sm:py-7">
+        <div className="relative max-h-[calc(88vh-10.5rem)] overflow-y-auto px-6 pb-8 pt-3 sm:px-9 sm:pb-10 lg:px-12">
           {activePanel === "about" && <AboutPanel />}
           {activePanel === "services" && <ServicesPanel />}
           {activePanel === "references" && <ReferencesPanel />}
@@ -200,44 +202,38 @@ export function ContentPanel({
 
 function AboutPanel() {
   return (
-    <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-      <div className="space-y-5 text-base leading-8 text-slate-300 sm:text-lg">
+    <div className="space-y-10">
+      <div className="max-w-4xl space-y-6 text-xl leading-9 text-slate-200/88 sm:text-2xl sm:leading-10">
         <p>
-          Ich entwickle moderne Websites für kleine Unternehmen in Deutschland
-          — klar strukturiert, mobil optimiert und auf echte Anfragen
+          Ich entwickle moderne Websites für kleine Unternehmen in Deutschland:
+          klar strukturiert, mobil optimiert und auf echte Anfragen
           ausgerichtet.
         </p>
-        <p>
+        <p className="text-base leading-8 text-slate-300/78 sm:text-lg">
           Ich verbinde Design, technische Umsetzung und ein praktisches
           Verständnis dafür, was lokale Unternehmen wirklich brauchen: einen
           professionellen Online-Auftritt, der Vertrauen schafft und Kunden den
           nächsten Schritt leicht macht.
         </p>
-        <p className="border-l border-cyan-200/20 pl-5 text-slate-400">
+        <p className="max-w-3xl border-l border-[#d89b3a]/28 pl-5 text-base leading-8 text-slate-400 sm:text-lg">
           Mein Fokus liegt auf klarer Kommunikation, sauberer Umsetzung und
           digitalen Lösungen, die nicht nur gut aussehen, sondern im Alltag
           funktionieren.
         </p>
       </div>
 
-      <div className="rounded-[1.4rem] border border-white/[0.08] bg-white/[0.035] p-5 shadow-[inset_0_0_38px_rgba(125,226,255,0.03)]">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-100/65">
-          DIMICH DIGITAL
-        </p>
-        <div className="mt-5 space-y-2.5">
-          {profileRows.map((row) => (
-            <div
-              key={row}
-              className="flex min-h-11 items-center justify-between rounded-2xl border border-white/[0.07] bg-white/[0.025] px-4 text-sm text-slate-300"
-            >
-              <span>{row}</span>
-              <span
-                aria-hidden="true"
-                className="h-1.5 w-1.5 rounded-full bg-cyan-200/55"
-              />
-            </div>
-          ))}
-        </div>
+      <div className="grid gap-6 border-t border-white/[0.08] pt-7 md:grid-cols-3">
+        {brandFacts.map(([number, label, text]) => (
+          <div key={label} className="space-y-4">
+            <p className="font-mono text-xs tracking-[0.24em] text-[#d89b3a]/62">
+              {number}
+            </p>
+            <h3 className="text-2xl font-semibold tracking-[-0.04em] text-[#f8f5ee]">
+              {label}
+            </h3>
+            <p className="text-sm leading-7 text-slate-400">{text}</p>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -245,313 +241,204 @@ function AboutPanel() {
 
 function ServicesPanel() {
   return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-      {services.map((service, index) => (
-        <article
-          key={service.title}
-          className="rounded-[1.1rem] border border-white/[0.08] bg-white/[0.035] p-4 shadow-[inset_0_0_32px_rgba(125,226,255,0.025)]"
-        >
-          <p className="font-mono text-xs text-cyan-100/45">
-            {String(index + 1).padStart(2, "0")}
-          </p>
-          <h3 className="mt-5 text-lg font-semibold tracking-[-0.02em] text-slate-50">
-            {service.title}
-          </h3>
-          <p className="mt-3 text-sm leading-7 text-slate-400">
-            {service.description}
-          </p>
-        </article>
-      ))}
+    <div className="space-y-10">
+      <p className="max-w-3xl text-lg leading-8 text-slate-300/86 sm:text-xl sm:leading-9">
+        Moderne Websites für lokale Unternehmen, die professionell auftreten
+        und online mehr Anfragen gewinnen möchten.
+      </p>
+
+      <div className="divide-y divide-white/[0.08] border-y border-white/[0.08]">
+        {services.map((service, index) => (
+          <article
+            key={service.title}
+            className="grid gap-5 py-7 md:grid-cols-[8rem_1fr] lg:grid-cols-[9rem_0.8fr_1fr]"
+          >
+            <p className="font-mono text-sm tracking-[0.3em] text-[#d89b3a]/65">
+              {String(index + 1).padStart(2, "0")}
+            </p>
+            <h3 className="text-2xl font-semibold tracking-[-0.045em] text-[#f8f5ee] sm:text-3xl">
+              {service.title}
+            </h3>
+            <p className="max-w-2xl text-base leading-8 text-slate-400">
+              {service.description}
+            </p>
+          </article>
+        ))}
+      </div>
+
+      <div className="flex flex-wrap gap-x-5 gap-y-3 text-sm uppercase tracking-[0.18em] text-slate-400">
+        {serviceTypes.map((item) => (
+          <span key={item}>{item}</span>
+        ))}
+      </div>
     </div>
   );
 }
 
 function ReferencesPanel() {
   return (
-    <div className="space-y-6">
-      <p className="max-w-3xl text-base leading-8 text-slate-300 sm:text-lg">
+    <div className="space-y-10">
+      <p className="max-w-3xl text-lg leading-8 text-slate-300/86 sm:text-xl sm:leading-9">
         Ein Blick auf Projekte, die moderne Websites, klare Nutzerführung und
         digitale Funktionen verbinden.
       </p>
 
-      <article className="relative overflow-hidden rounded-[1.6rem] border border-white/[0.08] bg-white/[0.035] p-5 shadow-[0_22px_78px_rgba(0,0,0,0.3),0_0_46px_rgba(48,213,255,0.08),inset_0_0_42px_rgba(125,226,255,0.03)] sm:p-6 lg:grid lg:grid-cols-[1.02fr_0.98fr] lg:gap-7">
-        <div
-          aria-hidden="true"
-          className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-200/30 to-transparent"
-        />
-        <div
-          aria-hidden="true"
-          className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-cyan-200/[0.045] blur-3xl"
-        />
-
-        <div className="relative">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-100/65">
-            STEINOutlet
-          </p>
-          <h3 className="mt-4 text-3xl font-semibold tracking-[-0.04em] text-slate-50 sm:text-4xl">
-            AI Kitchen Visualization Platform
-          </h3>
-          <p className="mt-5 text-base leading-8 text-slate-300">
-            Eine moderne digitale Plattform für Küchenarbeitsplatten mit
-            AI-gestützter Visualisierung. Nutzer können ein Küchenfoto
-            hochladen, Materialien auswählen und eine neue Arbeitsplatte digital
-            erleben.
-          </p>
-
-          <ul className="mt-6 space-y-3">
-            {steinOutletBullets.map((item) => (
-              <li
-                key={item}
-                className="flex gap-3 text-sm leading-6 text-slate-300"
-              >
-                <span
-                  aria-hidden="true"
-                  className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-200/70 shadow-[0_0_14px_rgba(125,226,255,0.55)]"
-                />
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
-
-          <div className="mt-6 flex flex-wrap gap-2">
-            {steinOutletTags.map((tag) => (
-              <span
-                key={tag}
-                className="rounded-full border border-white/[0.08] bg-white/[0.035] px-3 py-1.5 text-xs font-medium text-slate-300/85"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-
-          <a
-            href="#"
-            className="mt-7 inline-flex min-h-12 items-center justify-center rounded-full border border-cyan-200/20 bg-cyan-100/[0.055] px-6 text-sm font-semibold text-cyan-50 shadow-[0_18px_54px_rgba(48,213,255,0.08)] transition hover:-translate-y-0.5 hover:border-cyan-200/36 hover:bg-cyan-100/[0.08] focus:outline-none focus-visible:ring-4 focus-visible:ring-cyan-300/25"
-          >
-            Case Study ansehen
-          </a>
-        </div>
-
-        <SteinOutletMockup />
-      </article>
-    </div>
-  );
-}
-
-function SteinOutletMockup() {
-  return (
-    <div className="relative mt-7 overflow-hidden rounded-[1.35rem] border border-cyan-100/[0.09] bg-[radial-gradient(circle_at_50%_12%,rgba(125,226,255,0.1),transparent_44%),linear-gradient(180deg,rgba(255,255,255,0.055),rgba(255,255,255,0.02)),rgba(3,7,12,0.72)] p-3 shadow-[inset_0_0_42px_rgba(125,226,255,0.04)] sm:p-4 lg:mt-0">
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 bg-[linear-gradient(rgba(125,226,255,0.028)_1px,transparent_1px),linear-gradient(90deg,rgba(125,226,255,0.024)_1px,transparent_1px)] bg-[size:36px_36px] opacity-35"
-      />
-      <div className="relative overflow-hidden rounded-[1.1rem] border border-white/[0.08] bg-[#060b12]/90 shadow-[0_20px_56px_rgba(0,0,0,0.25)]">
-        <div className="flex min-h-11 items-center gap-3 border-b border-white/[0.07] bg-white/[0.035] px-3 sm:px-4">
-          <div className="flex shrink-0 gap-1.5" aria-hidden="true">
-            <span className="h-2.5 w-2.5 rounded-full bg-red-300/55" />
-            <span className="h-2.5 w-2.5 rounded-full bg-amber-200/55" />
-            <span className="h-2.5 w-2.5 rounded-full bg-emerald-300/55" />
-          </div>
-          <span className="min-w-0 flex-1 truncate rounded-full border border-white/[0.07] bg-black/18 px-3 py-1 text-xs font-medium text-slate-300/78">
-            steinoutlet.de
-          </span>
-          <span className="shrink-0 rounded-full border border-cyan-200/16 bg-cyan-100/[0.06] px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-cyan-100/75">
-            AI Preview
-          </span>
-        </div>
-
-        <div className="p-4 sm:p-5">
-          <div className="rounded-[1rem] border border-white/[0.07] bg-[radial-gradient(circle_at_80%_16%,rgba(125,226,255,0.09),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.045),rgba(255,255,255,0.018))] p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-100/58">
-              STEINOutlet
-            </p>
-            <h4 className="mt-3 max-w-sm text-2xl font-semibold leading-tight tracking-[-0.04em] text-slate-50">
-              Neue Arbeitsplatten digital erleben.
-            </h4>
-            <p className="mt-3 max-w-sm text-sm leading-6 text-slate-300/82">
-              Küchenfoto hochladen, Material wählen und AI-Vorschau starten.
-            </p>
-            <span className="mt-5 inline-flex min-h-11 items-center justify-center rounded-full border border-cyan-200/18 bg-cyan-100/[0.06] px-4 text-sm font-semibold text-cyan-50 shadow-[0_12px_38px_rgba(48,213,255,0.08)]">
-              Küchenfoto hochladen
-            </span>
-          </div>
-
-          <div className="mt-4 grid items-center gap-2 sm:grid-cols-[1fr_auto_1fr]">
-            <div className="rounded-[0.9rem] border border-white/[0.07] bg-white/[0.026] p-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
-                Before
-              </p>
-              <div className="mt-3 h-16 rounded-xl bg-[linear-gradient(135deg,rgba(148,163,184,0.12),rgba(15,23,42,0.65)),linear-gradient(90deg,rgba(255,255,255,0.07)_1px,transparent_1px)] bg-[size:auto,22px_22px]" />
-            </div>
-            <div
-              aria-hidden="true"
-              className="mx-auto h-px w-12 bg-gradient-to-r from-transparent via-cyan-100/32 to-transparent sm:h-12 sm:w-px sm:bg-gradient-to-b"
-            />
-            <div className="rounded-[0.9rem] border border-cyan-100/[0.11] bg-cyan-100/[0.035] p-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-cyan-100/62">
-                After
-              </p>
-              <div className="mt-3 h-16 rounded-xl bg-[radial-gradient(circle_at_72%_28%,rgba(125,226,255,0.13),transparent_24%),linear-gradient(120deg,#111820,#273039_38%,#0d131b_68%,#303944)]" />
-            </div>
-          </div>
-
-          <div className="mt-4 flex flex-wrap gap-2">
-            {materialChips.map((material) => (
-              <span
-                key={material}
-                className="rounded-full border border-white/[0.08] bg-white/[0.032] px-3 py-1.5 text-xs font-medium text-slate-300/88"
-              >
-                {material}
-              </span>
-            ))}
-          </div>
-
-          <div className="mt-4 grid gap-2 sm:grid-cols-3">
-            {previewStatus.map((status) => (
-              <div
-                key={status}
-                className="flex min-h-10 items-center justify-between rounded-full border border-white/[0.07] bg-white/[0.026] px-3 text-xs font-semibold text-slate-300/82"
-              >
-                <span>{status}</span>
-                <span
-                  aria-hidden="true"
-                  className="h-1.5 w-1.5 rounded-full bg-cyan-200/62 shadow-[0_0_12px_rgba(125,226,255,0.42)]"
-                />
-              </div>
-            ))}
-          </div>
-        </div>
+      <div className="space-y-10">
+        {caseStudies.map((project) => (
+          <CaseStudy key={project.title} project={project} />
+        ))}
       </div>
     </div>
   );
 }
 
-function ContactPanel() {
+function CaseStudy({
+  project,
+}: {
+  project: (typeof caseStudies)[number];
+}) {
   return (
-    <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
-      <div className="max-w-3xl">
-        <div className="space-y-5 text-base leading-8 text-slate-300 sm:text-lg">
-          <p>
-            Sie möchten eine moderne Website für Ihr Unternehmen? Schreiben Sie
-            mir kurz, worum es geht — ich melde mich mit einem klaren nächsten
-            Schritt.
+    <article className="relative overflow-hidden border-t border-[#d89b3a]/18 pt-8">
+      <div className="grid gap-8 lg:grid-cols-[1fr_18rem] lg:items-end">
+        <div className="max-w-4xl">
+          <p className="font-mono text-xs uppercase tracking-[0.28em] text-[#d89b3a]/65">
+            {project.index} / Case Study
           </p>
-          <p className="text-slate-400">
-            Ob Handwerksbetrieb, Küchenstudio, Restaurant, Salon oder lokaler
-            Service: Ich helfe dabei, einen professionellen digitalen Auftritt
-            aufzubauen.
+          <h3 className="mt-4 text-[clamp(2.4rem,6vw,5.25rem)] font-semibold leading-none tracking-[-0.06em] text-[#f8f5ee]">
+            {project.title}
+          </h3>
+          <p className="mt-3 text-xl font-medium tracking-[-0.03em] text-[#d89b3a] sm:text-2xl">
+            {project.subtitle}
+          </p>
+          {project.url && (
+            <a
+              href={project.url}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-3 inline-flex text-sm text-slate-400 underline decoration-[#d89b3a]/35 underline-offset-4 transition hover:text-[#f3d38a] focus:outline-none focus-visible:rounded-md focus-visible:ring-4 focus-visible:ring-[#d89b3a]/25"
+            >
+              {project.url}
+            </a>
+          )}
+          <p className="mt-6 max-w-3xl text-base leading-8 text-slate-300/86 sm:text-lg">
+            {project.description}
           </p>
         </div>
 
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+        <div className="case-visual-frame min-h-[11rem] overflow-hidden rounded-[2rem] border border-white/[0.1] bg-white/[0.025] p-6">
+          <p className="font-mono text-xs uppercase tracking-[0.28em] text-[#d89b3a]/58">
+            Portfolio
+          </p>
+          <p className="mt-8 text-5xl font-semibold tracking-[-0.08em] text-[#f8f5ee]/88">
+            {project.title}
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_18rem]">
+        <ul className="grid gap-4 sm:grid-cols-2">
+          {project.results.map((item) => (
+            <li
+              key={item}
+              className="border-l border-[#d89b3a]/25 pl-4 text-sm leading-7 text-slate-300"
+            >
+              {item}
+            </li>
+          ))}
+        </ul>
+
+        <div className="flex flex-wrap content-start gap-x-4 gap-y-2 text-xs uppercase tracking-[0.18em] text-slate-400">
+          {project.tags.map((tag) => (
+            <span key={tag}>{tag}</span>
+          ))}
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function ContactPanel() {
+  return (
+    <div className="grid gap-10 lg:grid-cols-[1fr_0.65fr] lg:items-start">
+      <div className="max-w-4xl">
+        <p className="text-2xl leading-10 text-slate-100/90 sm:text-3xl sm:leading-[1.35]">
+          Sie möchten eine moderne Website für Ihr Unternehmen? Schreiben Sie
+          mir kurz, worum es geht.
+        </p>
+        <p className="mt-6 max-w-3xl text-base leading-8 text-slate-400 sm:text-lg">
+          Ob Handwerksbetrieb, Küchenstudio, Restaurant, Salon oder lokaler
+          Service: Ich helfe dabei, einen professionellen digitalen Auftritt
+          aufzubauen und den nächsten Schritt klar zu machen.
+        </p>
+
+        <div className="mt-9 flex flex-col gap-3 sm:flex-row">
           <a
             href="#"
-            className="inline-flex min-h-12 items-center justify-center rounded-full border border-cyan-200/22 bg-cyan-100/[0.06] px-6 text-sm font-semibold text-cyan-50 shadow-[0_18px_54px_rgba(48,213,255,0.1)] transition hover:-translate-y-0.5 hover:border-cyan-200/38 hover:bg-cyan-100/[0.085] hover:shadow-[0_22px_62px_rgba(48,213,255,0.15)] focus:outline-none focus-visible:ring-4 focus-visible:ring-cyan-300/25"
+            className="inline-flex min-h-12 items-center justify-center rounded-full border border-[#d89b3a]/34 bg-[#d89b3a]/[0.085] px-7 text-sm font-semibold uppercase tracking-[0.16em] text-[#f3d38a] shadow-[0_18px_54px_rgba(216,155,58,0.08)] transition hover:-translate-y-0.5 hover:border-[#d89b3a]/52 hover:bg-[#d89b3a]/[0.12] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#d89b3a]/25"
           >
             WhatsApp schreiben
           </a>
           <a
             href="mailto:dimich.dn@gmail.com"
-            className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/12 bg-white/[0.035] px-6 text-sm font-semibold text-slate-200 shadow-[0_18px_54px_rgba(0,0,0,0.18)] transition hover:-translate-y-0.5 hover:border-cyan-200/28 hover:bg-cyan-100/[0.058] hover:text-cyan-50 hover:shadow-[0_20px_58px_rgba(48,213,255,0.1)] focus:outline-none focus-visible:ring-4 focus-visible:ring-cyan-300/25"
+            className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/14 bg-white/[0.032] px-7 text-sm font-semibold uppercase tracking-[0.16em] text-slate-200 transition hover:-translate-y-0.5 hover:border-[#d89b3a]/38 hover:text-[#f3d38a] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#d89b3a]/25"
           >
             E-Mail senden
           </a>
         </div>
       </div>
 
-      <div className="relative overflow-hidden rounded-[1.35rem] border border-white/[0.08] bg-[radial-gradient(circle_at_85%_12%,rgba(125,226,255,0.09),transparent_38%),linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.022)),rgba(3,7,12,0.68)] p-5 shadow-[0_22px_70px_rgba(0,0,0,0.28),0_0_42px_rgba(48,213,255,0.07),inset_0_0_38px_rgba(125,226,255,0.03)]">
-        <div
-          aria-hidden="true"
-          className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-200/28 to-transparent"
-        />
-        <div
-          aria-hidden="true"
-          className="absolute -right-16 -top-16 h-44 w-44 rounded-full bg-cyan-200/[0.05] blur-3xl"
-        />
-
-        <div className="relative">
-          <div className="flex items-center justify-between gap-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-100/62">
-              Antwort innerhalb von 24h
+      <aside className="space-y-5 border-l border-[#d89b3a]/18 pl-6">
+        <p className="font-mono text-xs uppercase tracking-[0.28em] text-[#d89b3a]/65">
+          Antwort innerhalb von 24h
+        </p>
+        {contactNotes.map(([label, value]) => (
+          <div key={label} className="space-y-1">
+            <p className="text-xs uppercase tracking-[0.18em] text-slate-500">
+              {label}
             </p>
-            <span
-              aria-hidden="true"
-              className="h-2.5 w-2.5 rounded-full bg-emerald-300/70 shadow-[0_0_16px_rgba(110,231,183,0.45)]"
-            />
+            <p className="text-base leading-7 text-slate-300">{value}</p>
           </div>
-
-          <div className="mt-5 grid gap-2">
-            {contactHighlights.map((item) => (
-              <div
-                key={item}
-                className="flex min-h-10 items-center justify-between gap-3 rounded-full border border-white/[0.07] bg-white/[0.026] px-3 text-sm text-slate-300"
-              >
-                <span>{item}</span>
-                <span
-                  aria-hidden="true"
-                  className="h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-200/58"
-                />
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-5 space-y-2.5">
-            {contactRows.map((row) => (
-              <div
-                key={row.label}
-                className="rounded-[1rem] border border-white/[0.07] bg-white/[0.024] p-4"
-              >
-                <p className="font-mono text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-cyan-100/45">
-                  {row.label}
-                </p>
-                <p className="mt-2 text-sm leading-6 text-slate-300">
-                  {row.value}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+        ))}
+      </aside>
     </div>
   );
 }
 
 function ImpressumPanel() {
   return (
-    <div className="max-w-3xl space-y-6 text-base leading-8 text-slate-300 sm:text-lg">
-      <div className="rounded-[1.25rem] border border-white/[0.08] bg-white/[0.032] p-5 shadow-[inset_0_0_34px_rgba(125,226,255,0.025)]">
-        <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-cyan-100/55">
+    <div className="max-w-4xl space-y-9 text-base leading-8 text-slate-300 sm:text-lg">
+      <section className="space-y-5 border-t border-white/[0.08] pt-7">
+        <p className="font-mono text-xs font-semibold uppercase tracking-[0.22em] text-[#d89b3a]/62">
           Angaben gemäß § 5 TMG
         </p>
-        <div className="mt-5 space-y-1 text-slate-200">
+        <div className="text-2xl leading-9 tracking-[-0.035em] text-[#f8f5ee]">
           <p>DIMICH DIGITAL</p>
           <p>Dmitry K.</p>
           <p>Deutschland</p>
         </div>
-      </div>
+      </section>
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div className="rounded-[1rem] border border-white/[0.07] bg-white/[0.026] p-4">
-          <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-cyan-100/45">
+      <section className="grid gap-7 border-t border-white/[0.08] pt-7 sm:grid-cols-2">
+        <div>
+          <p className="font-mono text-xs uppercase tracking-[0.22em] text-[#d89b3a]/58">
             E-Mail
           </p>
           <a
             href="mailto:dimich.dn@gmail.com"
-            className="mt-2 inline-flex text-slate-200 transition hover:text-cyan-100 focus:outline-none focus-visible:rounded-md focus-visible:ring-4 focus-visible:ring-cyan-300/25"
+            className="mt-3 inline-flex text-slate-200 transition hover:text-[#f3d38a] focus:outline-none focus-visible:rounded-md focus-visible:ring-4 focus-visible:ring-[#d89b3a]/25"
           >
             dimich.dn@gmail.com
           </a>
         </div>
-
-        <div className="rounded-[1rem] border border-white/[0.07] bg-white/[0.026] p-4">
-          <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-cyan-100/45">
+        <div>
+          <p className="font-mono text-xs uppercase tracking-[0.22em] text-[#d89b3a]/58">
             Verantwortlich für den Inhalt
           </p>
-          <p className="mt-2 text-slate-200">Dmitry K.</p>
+          <p className="mt-3 text-slate-200">Dmitry K.</p>
         </div>
-      </div>
+      </section>
 
-      <p className="border-l border-cyan-200/20 pl-5 text-sm leading-7 text-slate-400 sm:text-base">
+      <p className="max-w-3xl border-l border-[#d89b3a]/24 pl-5 text-sm leading-7 text-slate-400 sm:text-base">
         Hinweis: Dieses Impressum ist ein Platzhalter und wird vor der
         Veröffentlichung mit den finalen rechtlichen Angaben ergänzt.
       </p>
@@ -580,9 +467,11 @@ function PrivacyPanel() {
   ];
 
   return (
-    <div className="max-w-4xl space-y-6">
-      <div className="space-y-5 text-base leading-8 text-slate-300 sm:text-lg">
-        <p>Diese Datenschutzerklärung ist ein Platzhalter.</p>
+    <div className="max-w-5xl space-y-9">
+      <div className="max-w-4xl space-y-5 text-base leading-8 text-slate-300 sm:text-lg">
+        <p className="text-2xl leading-9 text-slate-100/90">
+          Diese Datenschutzerklärung ist ein Platzhalter.
+        </p>
         <p className="text-slate-400">
           Auf dieser Website werden aktuell keine komplexen Tracking- oder
           Analysefunktionen eingesetzt. Vor der Veröffentlichung wird diese
@@ -591,35 +480,30 @@ function PrivacyPanel() {
         </p>
       </div>
 
-      <div className="rounded-[1rem] border border-white/[0.07] bg-white/[0.026] p-4">
-        <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-cyan-100/45">
+      <div className="divide-y divide-white/[0.08] border-y border-white/[0.08]">
+        {privacySections.map((section) => (
+          <section key={section.title} className="grid gap-4 py-6 md:grid-cols-[18rem_1fr]">
+            <h3 className="text-lg font-semibold tracking-[-0.025em] text-[#f8f5ee]">
+              {section.title}
+            </h3>
+            <p className="text-sm leading-7 text-slate-400">{section.text}</p>
+          </section>
+        ))}
+      </div>
+
+      <div className="space-y-3">
+        <p className="font-mono text-xs uppercase tracking-[0.22em] text-[#d89b3a]/58">
           Kontakt
         </p>
         <a
           href="mailto:dimich.dn@gmail.com"
-          className="mt-2 inline-flex text-slate-200 transition hover:text-cyan-100 focus:outline-none focus-visible:rounded-md focus-visible:ring-4 focus-visible:ring-cyan-300/25"
+          className="inline-flex text-slate-200 transition hover:text-[#f3d38a] focus:outline-none focus-visible:rounded-md focus-visible:ring-4 focus-visible:ring-[#d89b3a]/25"
         >
           dimich.dn@gmail.com
         </a>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        {privacySections.map((section) => (
-          <article
-            key={section.title}
-            className="rounded-[1.1rem] border border-white/[0.08] bg-white/[0.032] p-4 shadow-[inset_0_0_30px_rgba(125,226,255,0.022)]"
-          >
-            <h3 className="text-base font-semibold text-slate-100">
-              {section.title}
-            </h3>
-            <p className="mt-3 text-sm leading-7 text-slate-400">
-              {section.text}
-            </p>
-          </article>
-        ))}
-      </div>
-
-      <p className="border-l border-cyan-200/20 pl-5 text-sm leading-7 text-slate-400 sm:text-base">
+      <p className="max-w-3xl border-l border-[#d89b3a]/24 pl-5 text-sm leading-7 text-slate-400 sm:text-base">
         Hinweis: Dieser Text ist ein Platzhalter und ersetzt keine rechtliche
         Prüfung.
       </p>

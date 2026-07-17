@@ -66,13 +66,13 @@ export function TechHero() {
     <main className="min-h-screen overflow-x-hidden bg-[#05070b] text-white">
       <section
         id="top"
-        className="relative isolate min-h-screen overflow-hidden px-4 py-5 sm:px-6 lg:px-8"
+        className="relative isolate min-h-screen overflow-hidden px-4 py-4 sm:px-6 lg:px-8 lg:py-5"
       >
         <HeroBackgroundVideo />
         <HeroBackground />
 
         <div
-          className={`relative z-10 mx-auto flex min-h-[calc(100vh-2.5rem)] w-full max-w-[1240px] flex-col transition duration-500 ${
+          className={`hero-shell relative z-10 mx-auto flex min-h-[calc(100vh-2.5rem)] w-full max-w-[1240px] flex-col transition duration-500 ${
             activePanel ? "scale-[0.985] opacity-45 blur-[2px]" : ""
           }`}
         >
@@ -81,8 +81,9 @@ export function TechHero() {
             onOpenPanel={setActivePanel}
           />
 
-          <div className="relative flex flex-1 flex-col justify-center py-8 sm:py-10 lg:py-8">
+          <div className="hero-main-slot relative flex flex-1 flex-col justify-center py-3 sm:py-10 lg:py-8">
             <HeroContent onOpenPanel={setActivePanel} />
+            <MobileTrustAccent />
           </div>
 
           <HeroFooter onOpenPanel={setActivePanel} />
@@ -103,7 +104,7 @@ function HeroFooter({
   onOpenPanel: (panel: ActivePanel) => void;
 }) {
   return (
-    <footer className="hero-reveal pb-3 text-center font-mono text-[0.68rem] uppercase tracking-[0.28em] text-white/36">
+    <footer className="hero-legal-footer hero-reveal pb-3 text-center font-mono text-[0.68rem] uppercase tracking-[0.28em] text-white/36">
       <p>[ Digital Minimal System 2026 ]</p>
       <div className="mt-2 flex items-center justify-center gap-2 text-[0.66rem] tracking-[0.18em] text-white/42">
         <button
@@ -128,6 +129,15 @@ function HeroFooter({
   );
 }
 
+function MobileTrustAccent() {
+  return (
+    <div className="mobile-trust-accent" aria-label="Leistungsversprechen">
+      <p>Webdesign für lokale Unternehmen in Deutschland</p>
+      <span>Responsive · Klar strukturiert · Schnell online</span>
+    </div>
+  );
+}
+
 function Header({
   onReset,
   onOpenPanel,
@@ -136,7 +146,7 @@ function Header({
   onOpenPanel: (panel: ActivePanel) => void;
 }) {
   return (
-    <header className="hero-reveal flex flex-col items-start gap-4 pt-2 lg:flex-row lg:items-center lg:justify-between lg:pt-3">
+    <header className="hero-reveal flex items-center justify-between gap-3 pt-1 lg:pt-3">
       <button
         type="button"
         onClick={onReset}
@@ -181,36 +191,56 @@ function HeroContent({
   onOpenPanel: (panel: ActivePanel) => void;
 }) {
   return (
-    <div className="hero-core hero-reveal hero-reveal-delay-1 relative z-10 mx-auto flex w-full max-w-[1140px] items-center justify-center overflow-hidden px-5 py-9 text-center sm:px-10 sm:py-12 lg:min-h-[500px] lg:px-16 lg:py-12">
+    <div className="hero-core hero-reveal hero-reveal-delay-1 relative z-10 mx-auto flex w-full max-w-[1140px] items-center justify-center overflow-hidden px-5 py-6 text-center sm:px-10 sm:py-12 lg:min-h-[500px] lg:px-16 lg:py-12">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-10 top-0 z-10 h-px bg-gradient-to-r from-transparent via-[#d89b3a]/45 to-transparent"
       />
 
       <div className="hero-core-copy relative z-10 mx-auto max-w-[900px] rounded-[2rem]">
-        <h1 className="hero-title mx-auto max-w-[900px] text-[clamp(2.45rem,6.7vw,5.25rem)] font-bold leading-[0.99] tracking-[-0.035em] text-slate-50 drop-shadow-[0_8px_28px_rgba(0,0,0,0.55)]">
-          <span className="block">Websites, die lokale</span>
-          <span className="block">
+        <h1 className="hero-title mx-auto max-w-[900px] text-[clamp(2.28rem,6.7vw,5.25rem)] font-bold leading-[0.99] tracking-[-0.035em] text-slate-50 drop-shadow-[0_8px_28px_rgba(0,0,0,0.55)]">
+          <span className="hidden sm:block">Websites, die lokale</span>
+          <span className="hidden sm:block">
             Kunden <span className="hero-title-gold">überzeugen.</span>
           </span>
+          <span className="block sm:hidden">Websites, die</span>
+          <span className="block sm:hidden">lokale Kunden</span>
+          <span className="hero-title-gold block sm:hidden">überzeugen.</span>
         </h1>
 
-        <p className="mx-auto mt-8 max-w-3xl text-base font-medium leading-8 text-slate-100/88 sm:text-xl sm:leading-9">
+        <p className="mx-auto mt-6 max-w-3xl text-base font-medium leading-7 text-slate-100/88 sm:mt-8 sm:text-xl sm:leading-9">
           {heroCopy.subtitle}
         </p>
 
-        <p className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-slate-300/78 sm:text-base sm:leading-8">
+        <p className="mx-auto mt-5 hidden max-w-2xl text-sm leading-7 text-slate-300/78 sm:block sm:text-base sm:leading-8">
           {heroCopy.description}
         </p>
 
-        <button
-          type="button"
-          onClick={() => onOpenPanel("services")}
-          className="hero-cta-link mt-9 inline-flex min-h-11 items-center justify-center gap-3 text-sm font-bold uppercase tracking-[0.3em] focus:outline-none focus-visible:rounded-full focus-visible:ring-4 focus-visible:ring-[#d89b3a]/25"
-        >
-          MEHR ERFAHREN
-          <span aria-hidden="true">-&gt;</span>
-        </button>
+        <div className="hero-mobile-cta-row mt-8 flex flex-col items-center justify-center gap-3 sm:mt-9 sm:flex-row">
+          <button
+            type="button"
+            onClick={() => onOpenPanel("services")}
+            className="hero-cta-link hidden min-h-11 items-center justify-center gap-3 text-sm font-bold uppercase tracking-[0.3em] focus:outline-none focus-visible:rounded-full focus-visible:ring-4 focus-visible:ring-[#d89b3a]/25 sm:inline-flex"
+          >
+            MEHR ERFAHREN
+            <span aria-hidden="true">-&gt;</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => onOpenPanel("contact")}
+            className="mobile-primary-cta sm:hidden"
+          >
+            WEBSITE ANFRAGEN
+          </button>
+          <button
+            type="button"
+            onClick={() => onOpenPanel("references")}
+            className="mobile-secondary-cta sm:hidden"
+          >
+            REFERENZEN ANSEHEN
+            <span aria-hidden="true">-&gt;</span>
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -221,24 +251,79 @@ function HeroNavigation({
 }: {
   onOpenPanel: (panel: ActivePanel) => void;
 }) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const standardNavItems = navItems.filter((item) => !item.highlight);
+
+  function openMobilePanel(panel: ActivePanel) {
+    setMobileMenuOpen(false);
+    onOpenPanel(panel);
+  }
+
   return (
-    <nav
-      aria-label="Hauptnavigation"
-      className="hero-nav hero-reveal hero-reveal-delay-2 grid w-full max-w-[760px] grid-cols-2 gap-2.5 sm:grid-cols-3 lg:flex lg:w-auto lg:max-w-none lg:flex-wrap lg:justify-end lg:gap-3"
-    >
-      {navItems.map((item) => (
+    <nav aria-label="Hauptnavigation" className="hero-nav hero-reveal hero-reveal-delay-2">
+      <div className="mobile-hero-actions lg:hidden">
         <button
-          key={`${item.label}-${item.panel}`}
           type="button"
-          onClick={() => onOpenPanel(item.panel)}
-          className={`hero-nav-pill ${item.highlight ? "hero-nav-pill-accent" : ""}`}
+          onClick={() => setMobileMenuOpen((isOpen) => !isOpen)}
+          className="mobile-menu-button"
+          aria-expanded={mobileMenuOpen}
+          aria-controls="mobile-hero-menu"
         >
-          <span aria-hidden="true" className="hero-nav-icon">
-            {item.icon}
-          </span>
-          <span>{item.label}</span>
+          Menü
         </button>
-      ))}
+        <button
+          type="button"
+          onClick={() => openMobilePanel("contact")}
+          className="mobile-whatsapp-button"
+        >
+          WhatsApp
+        </button>
+      </div>
+
+      {mobileMenuOpen && (
+        <div id="mobile-hero-menu" className="mobile-hero-menu lg:hidden">
+          {standardNavItems.map((item) => (
+            <button
+              key={`mobile-${item.label}-${item.panel}`}
+              type="button"
+              onClick={() => openMobilePanel(item.panel)}
+              className="mobile-hero-menu-item"
+            >
+              {item.label}
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={() => openMobilePanel("impressum")}
+            className="mobile-hero-menu-item"
+          >
+            Impressum
+          </button>
+          <button
+            type="button"
+            onClick={() => openMobilePanel("privacy")}
+            className="mobile-hero-menu-item"
+          >
+            Datenschutz
+          </button>
+        </div>
+      )}
+
+      <div className="hidden lg:flex lg:w-auto lg:max-w-none lg:flex-wrap lg:justify-end lg:gap-3">
+        {navItems.map((item) => (
+          <button
+            key={`${item.label}-${item.panel}`}
+            type="button"
+            onClick={() => onOpenPanel(item.panel)}
+            className={`hero-nav-pill ${item.highlight ? "hero-nav-pill-accent" : ""}`}
+          >
+            <span aria-hidden="true" className="hero-nav-icon">
+              {item.icon}
+            </span>
+            <span>{item.label}</span>
+          </button>
+        ))}
+      </div>
     </nav>
   );
 }
@@ -264,7 +349,7 @@ function HeroBackground() {
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-[53%] z-[2] h-[38rem] w-[58rem] max-w-[86vw] -translate-x-1/2 -translate-y-1/2 rounded-[56px] border border-white/[0.055]"
+        className="hero-desktop-frame-outline pointer-events-none absolute left-1/2 top-[53%] z-[2] h-[38rem] w-[58rem] max-w-[86vw] -translate-x-1/2 -translate-y-1/2 rounded-[56px] border border-white/[0.055]"
       />
       <div
         aria-hidden="true"
