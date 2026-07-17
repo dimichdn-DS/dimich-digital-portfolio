@@ -105,7 +105,7 @@ function HeroFooter({
 }) {
   return (
     <footer className="hero-legal-footer hero-reveal pb-3 text-center font-mono text-[0.68rem] uppercase tracking-[0.28em] text-white/36">
-      <p>[ Digital Minimal System 2026 ]</p>
+      <p>Webdesign für lokale Unternehmen in Deutschland</p>
       <div className="mt-2 flex items-center justify-center gap-2 text-[0.66rem] tracking-[0.18em] text-white/42">
         <button
           type="button"
@@ -179,6 +179,11 @@ function HeroBackgroundVideo() {
         preload="metadata"
         className="hero-background-video h-full w-full object-cover"
       >
+        <source
+          src="/videos/hero/dimich-hero-desktop-workspace-loop-v1.mp4"
+          type="video/mp4"
+          media="(min-width: 1024px)"
+        />
         <source src="/videos/dimich-office-line-bg.mp4" type="video/mp4" />
       </video>
     </div>
@@ -220,11 +225,28 @@ function HeroContent({
           <button
             type="button"
             onClick={() => onOpenPanel("services")}
-            className="hero-cta-link hidden min-h-11 items-center justify-center gap-3 text-sm font-bold uppercase tracking-[0.3em] focus:outline-none focus-visible:rounded-full focus-visible:ring-4 focus-visible:ring-[#d89b3a]/25 sm:inline-flex"
+            className="hero-cta-link hidden min-h-11 items-center justify-center gap-3 text-sm font-bold uppercase tracking-[0.3em] focus:outline-none focus-visible:rounded-full focus-visible:ring-4 focus-visible:ring-[#d89b3a]/25 sm:inline-flex lg:hidden"
           >
             MEHR ERFAHREN
             <span aria-hidden="true">-&gt;</span>
           </button>
+          <div className="desktop-hero-actions hidden items-center justify-center gap-5 lg:flex">
+            <button
+              type="button"
+              onClick={() => onOpenPanel("contact")}
+              className="desktop-primary-cta"
+            >
+              WEBSITE ANFRAGEN
+            </button>
+            <button
+              type="button"
+              onClick={() => onOpenPanel("references")}
+              className="desktop-secondary-cta"
+            >
+              REFERENZEN ANSEHEN
+              <span aria-hidden="true">-&gt;</span>
+            </button>
+          </div>
           <button
             type="button"
             onClick={() => onOpenPanel("contact")}
@@ -331,6 +353,10 @@ function HeroNavigation({
 function HeroBackground() {
   return (
     <>
+      <div
+        aria-hidden="true"
+        className="hero-desktop-video-overlay pointer-events-none absolute inset-0 z-[1]"
+      />
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(circle_at_50%_46%,rgba(216,155,58,0.045),transparent_34%),radial-gradient(circle_at_22%_22%,rgba(80,72,64,0.035),transparent_30%),linear-gradient(180deg,rgba(2,5,10,0.045)_0%,rgba(5,8,13,0.018)_48%,rgba(2,4,8,0.09)_100%)]"
