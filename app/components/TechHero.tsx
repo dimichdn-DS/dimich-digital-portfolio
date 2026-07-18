@@ -172,10 +172,12 @@ function HeroBackgroundVideo() {
       aria-hidden="true"
     >
       <video
+        aria-hidden="true"
         autoPlay
         muted
         loop
         playsInline
+        poster="/images/hero/dimich-hero-mobile-workspace-v1.png"
         preload="metadata"
         className="hero-background-video h-full w-full object-cover"
       >
@@ -184,7 +186,11 @@ function HeroBackgroundVideo() {
           type="video/mp4"
           media="(min-width: 1024px)"
         />
-        <source src="/videos/dimich-office-line-bg.mp4" type="video/mp4" />
+        <source
+          src="/videos/hero/dimich-hero-mobile-workspace-loop-v1.mp4"
+          type="video/mp4"
+          media="(max-width: 1023px)"
+        />
       </video>
     </div>
   );
@@ -356,6 +362,10 @@ function HeroBackground() {
       <div
         aria-hidden="true"
         className="hero-desktop-video-overlay pointer-events-none absolute inset-0 z-[1]"
+      />
+      <div
+        aria-hidden="true"
+        className="hero-mobile-video-overlay pointer-events-none absolute inset-0 z-[1]"
       />
       <div
         aria-hidden="true"
