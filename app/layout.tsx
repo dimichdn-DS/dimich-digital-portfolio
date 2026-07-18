@@ -1,10 +1,16 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "DIMICH DIGITAL | Websites für lokale Kunden",
   description:
     "Premium Websites, digitale Lösungen und klare Online-Auftritte für kleine Unternehmen in Deutschland.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
