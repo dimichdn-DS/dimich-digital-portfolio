@@ -207,7 +207,7 @@ function HeroContent({
     <div className="hero-core hero-reveal hero-reveal-delay-1 relative z-10 mx-auto flex w-full max-w-[1140px] items-center justify-center overflow-hidden px-5 py-6 text-center sm:px-10 sm:py-12 lg:min-h-[500px] lg:px-16 lg:py-12">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-10 top-0 z-10 h-px bg-gradient-to-r from-transparent via-[#d89b3a]/45 to-transparent"
+        className="hero-core-top-line pointer-events-none absolute inset-x-10 top-0 z-10 h-px bg-gradient-to-r from-transparent via-[#d89b3a]/45 to-transparent"
       />
 
       <div className="hero-core-copy relative z-10 mx-auto max-w-[900px] rounded-[2rem]">
@@ -221,11 +221,11 @@ function HeroContent({
           <span className="hero-title-gold block sm:hidden">überzeugen.</span>
         </h1>
 
-        <p className="mx-auto mt-6 max-w-3xl text-base font-medium leading-7 text-slate-100/88 sm:mt-8 sm:text-xl sm:leading-9">
+        <p className="hero-subtitle mx-auto mt-6 max-w-3xl text-base font-medium leading-7 text-slate-100/88 sm:mt-8 sm:text-xl sm:leading-9">
           {heroCopy.subtitle}
         </p>
 
-        <p className="mx-auto mt-5 hidden max-w-2xl text-sm leading-7 text-slate-300/78 sm:block sm:text-base sm:leading-8">
+        <p className="hero-description mx-auto mt-5 hidden max-w-2xl text-sm leading-7 text-slate-300/78 sm:block sm:text-base sm:leading-8">
           {heroCopy.description}
         </p>
 
@@ -242,33 +242,31 @@ function HeroContent({
             <button
               type="button"
               onClick={() => onOpenPanel("contact")}
-              className="desktop-primary-cta"
-            >
+            className="hero-action-button hero-action-primary desktop-primary-cta"
+          >
               WEBSITE ANFRAGEN
             </button>
             <button
               type="button"
               onClick={() => onOpenPanel("references")}
-              className="desktop-secondary-cta"
-            >
+            className="hero-action-button desktop-secondary-cta"
+          >
               REFERENZEN ANSEHEN
-              <span aria-hidden="true">-&gt;</span>
             </button>
           </div>
           <button
             type="button"
             onClick={() => onOpenPanel("contact")}
-            className="mobile-primary-cta sm:hidden"
+            className="hero-action-button hero-action-primary mobile-primary-cta sm:hidden"
           >
             WEBSITE ANFRAGEN
           </button>
           <button
             type="button"
             onClick={() => onOpenPanel("references")}
-            className="mobile-secondary-cta sm:hidden"
+            className="hero-action-button mobile-secondary-cta sm:hidden"
           >
             REFERENZEN ANSEHEN
-            <span aria-hidden="true">-&gt;</span>
           </button>
         </div>
       </div>
