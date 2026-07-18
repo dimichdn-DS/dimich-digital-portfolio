@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export type ActivePanel =
   | "about"
@@ -149,6 +149,80 @@ export function ContentPanel({
   onClose: () => void;
 }) {
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
+  const panelRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (!activePanel) {
+      return;
+    }
+
+    const activePanelElement = panelRef.current;
+
+    if (!activePanelElement) {
+      return;
+    }
+
+    const panelElement: HTMLElement = activePanelElement;
+
+    const focusableSelector = [
+      "a[href]",
+      "button:not([disabled])",
+      "input:not([disabled])",
+      "select:not([disabled])",
+      "textarea:not([disabled])",
+      '[tabindex]:not([tabindex="-1"])',
+    ].join(",");
+
+    function getFocusableElements() {
+      return Array.from(
+        panelElement.querySelectorAll<HTMLElement>(focusableSelector),
+      ).filter((element) => element.getClientRects().length > 0);
+    }
+
+    function keepFocusInsidePanel(event: KeyboardEvent) {
+      if (event.key !== "Tab") {
+        return;
+      }
+
+      const focusableElements = getFocusableElements();
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements.at(-1);
+
+      if (!firstElement || !lastElement) {
+        event.preventDefault();
+        closeButtonRef.current?.focus();
+        return;
+      }
+
+      const activeElement = document.activeElement;
+
+      if (
+        event.shiftKey &&
+        (activeElement === firstElement ||
+          !panelElement.contains(activeElement))
+      ) {
+        event.preventDefault();
+        lastElement.focus();
+      } else if (
+        !event.shiftKey &&
+        (activeElement === lastElement ||
+          !panelElement.contains(activeElement))
+      ) {
+        event.preventDefault();
+        firstElement.focus();
+      }
+    }
+
+    document.addEventListener("keydown", keepFocusInsidePanel, true);
+    const focusFrame = requestAnimationFrame(() => {
+      closeButtonRef.current?.focus({ preventScroll: true });
+    });
+
+    return () => {
+      cancelAnimationFrame(focusFrame);
+      document.removeEventListener("keydown", keepFocusInsidePanel, true);
+    };
+  }, [activePanel]);
 
   if (!activePanel) {
     return null;
@@ -171,7 +245,11 @@ export function ContentPanel({
         onClick={onClose}
       />
 
-      <section className="content-panel" data-panel={activePanel}>
+      <section
+        ref={panelRef}
+        className="content-panel"
+        data-panel={activePanel}
+      >
         <header className="content-panel-header">
           <div className="content-panel-heading">
             <p className="content-panel-eyebrow">{meta.label}</p>
@@ -200,7 +278,12 @@ export function ContentPanel({
           </button>
         </header>
 
-        <div className="content-panel-scroll">
+        <div
+          className="content-panel-scroll"
+          role="region"
+          tabIndex={0}
+          aria-label={`${meta.label}: Inhalt`}
+        >
           <div className="content-panel-body">
             {activePanel === "about" && <AboutPanel />}
             {activePanel === "services" && <ServicesPanel />}

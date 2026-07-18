@@ -106,6 +106,7 @@ export function TechHero({
 }) {
   const [activePanel, setActivePanel] = useState<ActivePanel | null>(null);
   const panelOpenerRef = useRef<HTMLElement | null>(null);
+  const heroShellRef = useRef<HTMLDivElement | null>(null);
 
   const openPanel = useCallback(
     (panel: ActivePanel, options?: OpenPanelOptions) => {
@@ -180,40 +181,64 @@ export function TechHero({
     };
   }, [activePanel]);
 
+  useEffect(() => {
+    const heroShell = heroShellRef.current;
+
+    if (!heroShell) {
+      return;
+    }
+
+    if (activePanel) {
+      heroShell.setAttribute("inert", "");
+    } else {
+      heroShell.removeAttribute("inert");
+    }
+
+    return () => heroShell.removeAttribute("inert");
+  }, [activePanel]);
+
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[#05070b] text-white">
-      <section
-        id="top"
-        className="hero-stage relative isolate min-h-screen overflow-hidden px-4 py-4 sm:px-6 lg:px-8 lg:py-5"
+    <>
+      <a className="skip-link" href="#main-content">
+        Zum Hauptinhalt springen
+      </a>
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className="min-h-screen overflow-x-hidden bg-[#05070b] text-white"
       >
-        <HeroBackgroundVideo poster={videoPoster} />
-        <HeroBackground />
-
-        <div
-          className={`hero-shell relative z-10 mx-auto flex min-h-[calc(100vh-2.5rem)] w-full max-w-[1240px] flex-col transition duration-500 ${
-            activePanel ? "scale-[0.985] opacity-45 blur-[2px]" : ""
-          }`}
+        <section
+          id="top"
+          className="hero-stage relative isolate min-h-screen overflow-hidden px-4 py-4 sm:px-6 lg:px-8 lg:py-5"
         >
-          <Header
-            brandLogo={brandLogo}
-            onReset={closePanel}
-            onOpenPanel={openPanel}
-          />
+          <HeroBackgroundVideo poster={videoPoster} />
+          <HeroBackground />
 
-          <div className="hero-main-slot relative flex flex-1 flex-col justify-center py-3 sm:py-10 lg:py-8">
-            <HeroContent onOpenPanel={openPanel} />
-            <MobileTrustAccent />
+          <div
+            ref={heroShellRef}
+            aria-hidden={activePanel ? "true" : undefined}
+            className={`hero-shell relative z-10 mx-auto flex min-h-[calc(100vh-2.5rem)] w-full max-w-[1240px] flex-col transition duration-500 ${
+              activePanel ? "scale-[0.985] opacity-45 blur-[2px]" : ""
+            }`}
+          >
+            <Header
+              brandLogo={brandLogo}
+              onReset={closePanel}
+              onOpenPanel={openPanel}
+            />
+
+            <div className="hero-main-slot relative flex flex-1 flex-col justify-center py-3 sm:py-10 lg:py-8">
+              <HeroContent onOpenPanel={openPanel} />
+              <MobileTrustAccent />
+            </div>
+
+            <HeroFooter onOpenPanel={openPanel} />
           </div>
 
-          <HeroFooter onOpenPanel={openPanel} />
-        </div>
-
-        <ContentPanel
-          activePanel={activePanel}
-          onClose={closePanel}
-        />
-      </section>
-    </main>
+          <ContentPanel activePanel={activePanel} onClose={closePanel} />
+        </section>
+      </main>
+    </>
   );
 }
 

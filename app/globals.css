@@ -20,6 +20,30 @@ body {
   color: #f8fafc;
 }
 
+.skip-link {
+  position: fixed;
+  top: max(12px, env(safe-area-inset-top));
+  left: 16px;
+  z-index: 100;
+  transform: translateY(calc(-100% - 24px));
+  border: 1px solid rgba(232, 189, 107, 0.72);
+  border-radius: 999px;
+  background: rgba(7, 8, 9, 0.94);
+  padding: 0.75rem 1rem;
+  color: #f7f3ea;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.42);
+  transition: transform 180ms ease;
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 2px solid rgba(232, 189, 107, 0.92);
+  outline-offset: 3px;
+}
+
 ::selection {
   background: rgba(216, 155, 58, 0.34);
   color: #ffffff;
@@ -473,6 +497,7 @@ body {
 }
 
 .content-panel-close:focus-visible,
+.content-panel-scroll:focus-visible,
 .panel-text-action:focus-visible,
 .panel-contact-action:focus-visible,
 .panel-briefing-field input:focus-visible,
@@ -482,6 +507,20 @@ body {
 .panel-legal a:focus-visible {
   outline: 2px solid rgba(232, 189, 107, 0.88);
   outline-offset: 4px;
+}
+
+.content-panel-scroll:focus-visible {
+  outline-offset: -3px;
+}
+
+.hero-legal-footer button {
+  position: relative;
+}
+
+.hero-legal-footer button::before {
+  content: "";
+  position: absolute;
+  inset: -15px 0;
 }
 
 .content-panel-scroll {
@@ -619,7 +658,7 @@ body {
 
 .panel-sector-line {
   margin: 30px 0 0;
-  color: rgba(208, 204, 195, 0.56);
+  color: rgba(208, 204, 195, 0.6);
   font-size: 0.78rem;
   letter-spacing: 0.08em;
   line-height: 1.9;
@@ -679,7 +718,7 @@ body {
 }
 
 .panel-case-visual span {
-  color: rgba(232, 226, 214, 0.48);
+  color: rgba(232, 226, 214, 0.55);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 0.64rem;
   letter-spacing: 0.18em;
@@ -803,7 +842,7 @@ body {
 .panel-case-tags {
   max-width: 600px;
   margin: 0;
-  color: rgba(196, 192, 184, 0.55);
+  color: rgba(196, 192, 184, 0.62);
   font-size: 0.68rem;
   letter-spacing: 0.08em;
   line-height: 1.8;
@@ -811,6 +850,9 @@ body {
 }
 
 .panel-text-action {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
   flex: none;
   color: #e4ba68;
   font-size: 0.77rem;
@@ -908,7 +950,7 @@ body {
 
 .panel-briefing-field input::placeholder,
 .panel-briefing-field textarea::placeholder {
-  color: rgba(207, 202, 193, 0.43);
+  color: rgba(207, 202, 193, 0.6);
   opacity: 1;
 }
 
@@ -1014,7 +1056,7 @@ body {
 .panel-briefing-privacy {
   max-width: 700px;
   margin: 12px 0 0;
-  color: rgba(199, 194, 185, 0.55);
+  color: rgba(199, 194, 185, 0.62);
   font-size: 0.72rem;
   line-height: 1.6;
 }
@@ -1072,7 +1114,7 @@ body {
 }
 
 .panel-contact-note dt {
-  color: rgba(193, 189, 181, 0.5);
+  color: rgba(193, 189, 181, 0.64);
   font-size: 0.67rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -1457,7 +1499,7 @@ body {
 
 .mobile-menu-button,
 .mobile-whatsapp-button {
-  min-height: 40px;
+  min-height: 44px;
   border-radius: 999px;
   border: 1px solid rgba(216, 155, 58, 0.2);
   background:
@@ -2091,7 +2133,7 @@ body {
   .panel-swipe-hint {
     display: block;
     margin: 18px 0 0;
-    color: rgba(216, 155, 58, 0.58);
+    color: rgba(216, 155, 58, 0.76);
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 0.61rem;
     letter-spacing: 0.09em;
@@ -2421,7 +2463,7 @@ body {
   }
   .hero-legal-footer {
     padding-bottom: 0.25rem;
-    opacity: 0.34;
+    opacity: 1;
     font-size: 0.56rem;
     letter-spacing: 0.18em;
   }
@@ -2434,7 +2476,8 @@ body {
     margin-top: 0;
     font-size: 0.58rem;
     letter-spacing: 0.12em;
-    color: rgba(255, 255, 255, 0.32);
+    color: rgba(248, 245, 238, 0.62);
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.68);
   }
 
   .perspective-grid,
@@ -2460,7 +2503,7 @@ body {
   }
 
   .mobile-menu-button {
-    min-height: 40px;
+    min-height: 44px;
     font-size: 0.58rem;
     letter-spacing: 0.1em;
   }
@@ -2470,10 +2513,10 @@ body {
   }
 
   .mobile-whatsapp-button {
-    width: 42px;
-    min-width: 42px;
-    height: 42px;
-    min-height: 42px;
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    min-height: 44px;
   }
 }
 
@@ -2693,7 +2736,7 @@ body {
   }
 }
 
-@media (max-width: 1023px) and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
   .hero-background-video-wrap {
     background:
       linear-gradient(180deg, rgba(5, 6, 8, 0.22), rgba(5, 6, 8, 0.36)),
