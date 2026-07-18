@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ContentPanel, type ActivePanel } from "./ContentPanel";
 
 const heroCopy = {
@@ -280,10 +280,120 @@ function HeroNavigation({
   onOpenPanel: (panel: ActivePanel) => void;
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const mobileMenuDialogRef = useRef<HTMLDialogElement | null>(null);
+  const mobileMenuTriggerRef = useRef<HTMLButtonElement>(null);
+  const restoreFocusAfterCloseRef = useRef(true);
   const standardNavItems = navItems.filter((item) => !item.highlight);
 
-  function openMobilePanel(panel: ActivePanel) {
+  useEffect(() => {
+    if (!mobileMenuOpen) {
+      return;
+    }
+
+    const { body, documentElement } = document;
+    const scrollPosition = window.scrollY;
+    const scrollbarWidth = window.innerWidth - documentElement.clientWidth;
+    const computedBodyPadding = Number.parseFloat(
+      window.getComputedStyle(body).paddingRight,
+    );
+    const previousBodyStyles = {
+      position: body.style.position,
+      top: body.style.top,
+      left: body.style.left,
+      right: body.style.right,
+      width: body.style.width,
+      overflow: body.style.overflow,
+      paddingRight: body.style.paddingRight,
+    };
+    const previousHtmlOverflow = documentElement.style.overflow;
+
+    documentElement.style.overflow = "hidden";
+    body.style.position = "fixed";
+    body.style.top = `-${scrollPosition}px`;
+    body.style.left = "0";
+    body.style.right = "0";
+    body.style.width = "100%";
+    body.style.overflow = "hidden";
+
+    if (scrollbarWidth > 0) {
+      body.style.paddingRight = `${
+        (Number.isFinite(computedBodyPadding) ? computedBodyPadding : 0) +
+        scrollbarWidth
+      }px`;
+    }
+
+    return () => {
+      documentElement.style.overflow = previousHtmlOverflow;
+      body.style.position = previousBodyStyles.position;
+      body.style.top = previousBodyStyles.top;
+      body.style.left = previousBodyStyles.left;
+      body.style.right = previousBodyStyles.right;
+      body.style.width = previousBodyStyles.width;
+      body.style.overflow = previousBodyStyles.overflow;
+      body.style.paddingRight = previousBodyStyles.paddingRight;
+      window.scrollTo({ top: scrollPosition, left: 0, behavior: "auto" });
+    };
+  }, [mobileMenuOpen]);
+
+  useEffect(() => {
+    const desktopMediaQuery = window.matchMedia("(min-width: 1024px)");
+
+    function closeMenuAtDesktopBreakpoint(event: MediaQueryListEvent) {
+      if (!event.matches) {
+        return;
+      }
+
+      restoreFocusAfterCloseRef.current = false;
+      mobileMenuDialogRef.current?.close();
+      setMobileMenuOpen(false);
+    }
+
+    desktopMediaQuery.addEventListener("change", closeMenuAtDesktopBreakpoint);
+    return () =>
+      desktopMediaQuery.removeEventListener(
+        "change",
+        closeMenuAtDesktopBreakpoint,
+      );
+  }, []);
+
+  function closeMobileMenu(restoreFocus = true) {
+    const dialog = mobileMenuDialogRef.current;
+
+    restoreFocusAfterCloseRef.current = restoreFocus;
+
+    if (dialog?.open) {
+      dialog.close();
+    } else if (restoreFocus) {
+      mobileMenuTriggerRef.current?.focus({ preventScroll: true });
+    }
+
     setMobileMenuOpen(false);
+  }
+
+  function openMobileMenu() {
+    const dialog = mobileMenuDialogRef.current;
+
+    if (!dialog || dialog.open) {
+      return;
+    }
+
+    restoreFocusAfterCloseRef.current = true;
+    dialog.showModal();
+    setMobileMenuOpen(dialog.open);
+  }
+
+  function handleMobileMenuClosed() {
+    setMobileMenuOpen(false);
+
+    if (restoreFocusAfterCloseRef.current) {
+      mobileMenuTriggerRef.current?.focus({ preventScroll: true });
+    }
+
+    restoreFocusAfterCloseRef.current = true;
+  }
+
+  function openMobilePanel(panel: ActivePanel) {
+    closeMobileMenu(false);
     onOpenPanel(panel);
   }
 
@@ -291,8 +401,9 @@ function HeroNavigation({
     <nav aria-label="Hauptnavigation" className="hero-nav hero-reveal hero-reveal-delay-2">
       <div className="mobile-hero-actions lg:hidden">
         <button
+          ref={mobileMenuTriggerRef}
           type="button"
-          onClick={() => setMobileMenuOpen((isOpen) => !isOpen)}
+          onClick={openMobileMenu}
           className="mobile-menu-button"
           aria-expanded={mobileMenuOpen}
           aria-controls="mobile-hero-menu"
@@ -310,34 +421,87 @@ function HeroNavigation({
         </button>
       </div>
 
-      {mobileMenuOpen && (
-        <div id="mobile-hero-menu" className="mobile-hero-menu lg:hidden">
-          {standardNavItems.map((item) => (
+      <dialog
+        ref={mobileMenuDialogRef}
+        id="mobile-hero-menu"
+        className="mobile-menu-dialog"
+        aria-label="Navigation"
+        aria-modal="true"
+        onClose={handleMobileMenuClosed}
+        onCancel={(event) => {
+          event.preventDefault();
+          closeMobileMenu();
+        }}
+        onClick={(event) => {
+          const dialog = mobileMenuDialogRef.current;
+
+          if (dialog && event.target === dialog) {
+            closeMobileMenu();
+          }
+        }}
+      >
+        <section className="mobile-menu-stage">
+          <header className="mobile-menu-header">
+            <p>DIMICH DIGITAL</p>
             <button
-              key={`mobile-${item.label}-${item.panel}`}
               type="button"
-              onClick={() => openMobilePanel(item.panel)}
-              className="mobile-hero-menu-item"
+              autoFocus
+              onClick={() => closeMobileMenu()}
+              className="mobile-menu-close"
+              aria-label="Menü schließen"
             >
-              {item.label}
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <path d="M6 6L18 18" />
+                <path d="M18 6L6 18" />
+              </svg>
             </button>
-          ))}
-          <button
-            type="button"
-            onClick={() => openMobilePanel("impressum")}
-            className="mobile-hero-menu-item"
-          >
-            Impressum
-          </button>
-          <button
-            type="button"
-            onClick={() => openMobilePanel("privacy")}
-            className="mobile-hero-menu-item"
-          >
-            Datenschutz
-          </button>
-        </div>
-      )}
+          </header>
+
+          <div className="mobile-menu-body">
+            <div className="mobile-menu-primary-list">
+              {standardNavItems.map((item) => (
+                <button
+                  key={`mobile-${item.label}-${item.panel}`}
+                  type="button"
+                  onClick={() => openMobilePanel(item.panel)}
+                  className="mobile-menu-primary-item"
+                >
+                  <span>{item.label}</span>
+                  <svg
+                    aria-hidden="true"
+                    className="mobile-menu-arrow"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <path d="M5 12H19" />
+                    <path d="M14 7L19 12L14 17" />
+                  </svg>
+                </button>
+              ))}
+            </div>
+
+            <div className="mobile-menu-legal">
+              <button
+                type="button"
+                onClick={() => openMobilePanel("impressum")}
+              >
+                Impressum
+              </button>
+              <span aria-hidden="true">·</span>
+              <button
+                type="button"
+                onClick={() => openMobilePanel("privacy")}
+              >
+                Datenschutz
+              </button>
+            </div>
+          </div>
+        </section>
+      </dialog>
 
       <div className="hidden lg:flex lg:w-auto lg:max-w-none lg:flex-wrap lg:justify-end lg:gap-3">
         {navItems.map((item) => (

@@ -33,32 +33,31 @@ const panelMeta: Record<ActivePanel, { label: string; title: string }> = {
   },
 };
 
-const brandFacts = [
-  ["01", "Design", "Ruhige visuelle Systeme, die Vertrauen schaffen."],
-  ["02", "Development", "Saubere Umsetzung mit Fokus auf Geschwindigkeit."],
-  ["03", "AI-ready", "Moderne Funktionen, wenn sie dem Projekt wirklich helfen."],
-];
-
 const services = [
   {
-    title: "Websites für lokale Unternehmen",
+    title: "Webdesign",
     description:
-      "Klar strukturierte Auftritte für Handwerk, Bau, Küchenstudios, Restaurants, Beauty und lokale Services.",
+      "Klar strukturierte Websites für Handwerk, Bau, Küchenstudios, Restaurants, Beauty und lokale Services.",
   },
   {
-    title: "Responsive Design",
+    title: "Responsive Umsetzung",
     description:
       "Layouts, die auf Desktop, iPhone und Android hochwertig wirken und ohne Reibung bedienbar bleiben.",
   },
   {
-    title: "Digitale Kundenanfragen",
+    title: "Lokale Sichtbarkeit",
     description:
-      "Kontaktwege, klare Nutzerführung und Inhalte, die Besuchern den nächsten Schritt einfach machen.",
+      "Klare Nutzerführung, relevante Inhalte und direkte Kontaktwege machen aus Besuchen konkrete Anfragen.",
   },
   {
     title: "AI-ready Lösungen",
     description:
-      "Upload-Flows, Visualisierungskonzepte, Landingpages und digitale Funktionen, die erweiterbar bleiben.",
+      "Upload-Flows, Visualisierungskonzepte und digitale Funktionen, die sinnvoll erweiterbar bleiben.",
+  },
+  {
+    title: "Wartung & Support",
+    description:
+      "Saubere Veröffentlichung und verlässliche technische Begleitung auch nach dem Projektstart.",
   },
 ];
 
@@ -75,55 +74,43 @@ const serviceTypes = [
 
 const caseStudies = [
   {
-    index: "01",
     title: "STEINOutlet",
     subtitle: "AI Kitchen Visualization Platform",
     url: "",
+    action: "Case Study ansehen",
     description:
-      "Eine moderne digitale Plattform für Küchenarbeitsplatten mit AI-gestützter Visualisierung. Nutzer können ein Küchenfoto hochladen, Materialien auswählen und eine neue Arbeitsplatte digital erleben.",
+      "Eine moderne digitale Plattform für Küchenarbeitsplatten mit AI-gestützter Visualisierung.",
+    problem:
+      "Materialien und neue Arbeitsplatten lassen sich vor einer Entscheidung nur schwer im eigenen Raum einschätzen.",
+    solution:
+      "Nutzer laden ein Küchenfoto hoch, wählen Naturstein, Keramik oder Quarzkomposit und erleben die neue Oberfläche digital.",
     results: [
       "Premium Website für Küchen & Arbeitsplatten",
       "Upload-Flow für Küchenfotos",
-      "Materialauswahl für Naturstein, Keramik und Quarzkomposit",
       "AI-ready Visualisierungskonzept",
-      "Responsive Design für Desktop, iPhone und Android",
+      "Responsive für Desktop, iPhone und Android",
     ],
-    tags: [
-      "Next.js",
-      "TypeScript",
-      "AI-ready",
-      "Responsive Design",
-      "Kitchen Studio",
-      "Local Business",
-    ],
+    tags: ["Next.js", "TypeScript", "AI-ready", "Responsive Design"],
   },
   {
-    index: "02",
     title: "AURA",
     subtitle: "Premium Nail Studio Landing Page",
     url: "https://aura-landing-two-zeta.vercel.app",
+    action: "Website ansehen",
     description:
       "Dark elegant landing page for a nail studio with video hero, multilingual structure, booking CTA and mobile-first layout.",
+    problem:
+      "Das Studio brauchte einen hochwertigen digitalen Auftritt, der Atmosphäre und Buchungsweg auf jedem Gerät verbindet.",
+    solution:
+      "Eine fokussierte Landingpage mit Video-Hero, mehrsprachiger Struktur, klarer Booking-CTA und mobile-first Layout.",
     results: [
-      "Video hero with dark elegant atmosphere",
-      "Multilingual structure for studio visitors",
-      "Booking CTA and mobile-first layout",
+      "Cinematic video hero",
+      "Multilingual structure",
+      "Direct booking journey",
+      "Mobile-first implementation",
     ],
-    tags: [
-      "HTML",
-      "CSS",
-      "JavaScript",
-      "Vercel",
-      "Beauty Studio",
-      "Responsive Design",
-    ],
+    tags: ["HTML", "CSS", "JavaScript", "Vercel", "Beauty Studio"],
   },
-];
-
-const contactNotes = [
-  ["Start", "Kurzes Erstgespräch"],
-  ["Fokus", "Klare Website, mehr Vertrauen, mehr Anfragen"],
-  ["Umsetzung", "Design, Entwicklung, Veröffentlichung"],
 ];
 
 export function ContentPanel({
@@ -141,7 +128,7 @@ export function ContentPanel({
 
   return (
     <div
-      className="content-panel-backdrop fixed inset-0 z-50 flex items-center justify-center px-4 py-5 sm:px-6"
+      className="content-panel-backdrop"
       role="dialog"
       aria-modal="true"
       aria-labelledby="content-panel-title"
@@ -150,29 +137,15 @@ export function ContentPanel({
         type="button"
         aria-label="Panel über Hintergrund schließen"
         tabIndex={-1}
-        className="absolute inset-0 cursor-default"
+        className="content-panel-dismiss-layer"
         onClick={onClose}
       />
 
-      <section className="content-panel relative max-h-[88vh] w-full max-w-[1180px] overflow-hidden rounded-[2.2rem] border border-[#d89b3a]/18 bg-[linear-gradient(145deg,rgba(255,255,255,0.055),rgba(12,12,12,0.18)_38%,rgba(0,0,0,0.24)),rgba(5,6,8,0.18)] shadow-[0_38px_130px_rgba(0,0,0,0.46),0_0_90px_rgba(216,155,58,0.05),inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-[3px] sm:rounded-[2.8rem]">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-[#d89b3a]/42 to-transparent"
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -right-24 -top-28 h-80 w-80 rounded-full bg-[#d89b3a]/[0.025] blur-3xl"
-        />
-
-        <div className="relative flex items-start justify-between gap-5 px-6 pb-5 pt-7 sm:px-9 sm:pt-9 lg:px-12">
-          <div className="max-w-4xl">
-            <p className="font-mono text-xs font-semibold uppercase tracking-[0.28em] text-[#d89b3a]/72">
-              {meta.label}
-            </p>
-            <h2
-              id="content-panel-title"
-              className="mt-4 text-[clamp(2.1rem,5vw,4.75rem)] font-semibold leading-[0.98] tracking-[-0.055em] text-[#f8f5ee]"
-            >
+      <section className="content-panel" data-panel={activePanel}>
+        <header className="content-panel-header">
+          <div className="content-panel-heading">
+            <p className="content-panel-eyebrow">{meta.label}</p>
+            <h2 id="content-panel-title" className="content-panel-title">
               {meta.title}
             </h2>
           </div>
@@ -180,20 +153,30 @@ export function ContentPanel({
           <button
             type="button"
             onClick={onClose}
-            className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-[#d89b3a]/22 bg-black/15 text-xl leading-none text-[#f8f5ee]/82 transition hover:-translate-y-0.5 hover:border-[#d89b3a]/42 hover:bg-[#d89b3a]/[0.07] hover:text-[#f3d38a] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#d89b3a]/25"
+            className="content-panel-close"
             aria-label="Panel schließen"
           >
-            ×
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+              fill="none"
+            >
+              <path d="M5 5 19 19M19 5 5 19" />
+            </svg>
           </button>
-        </div>
+        </header>
 
-        <div className="relative max-h-[calc(88vh-10.5rem)] overflow-y-auto px-6 pb-8 pt-3 sm:px-9 sm:pb-10 lg:px-12">
-          {activePanel === "about" && <AboutPanel />}
-          {activePanel === "services" && <ServicesPanel />}
-          {activePanel === "references" && <ReferencesPanel />}
-          {activePanel === "contact" && <ContactPanel />}
-          {activePanel === "impressum" && <ImpressumPanel />}
-          {activePanel === "privacy" && <PrivacyPanel />}
+        <div className="content-panel-scroll">
+          <div className="content-panel-body">
+            {activePanel === "about" && <AboutPanel />}
+            {activePanel === "services" && <ServicesPanel />}
+            {activePanel === "references" && <ReferencesPanel />}
+            {activePanel === "contact" && <ContactPanel />}
+            {activePanel === "impressum" && <ImpressumPanel />}
+            {activePanel === "privacy" && <PrivacyPanel />}
+          </div>
         </div>
       </section>
     </div>
@@ -202,92 +185,83 @@ export function ContentPanel({
 
 function AboutPanel() {
   return (
-    <div className="space-y-10">
-      <div className="max-w-4xl space-y-6 text-xl leading-9 text-slate-200/88 sm:text-2xl sm:leading-10">
-        <p>
-          Ich entwickle moderne Websites für kleine Unternehmen in Deutschland:
-          klar strukturiert, mobil optimiert und auf echte Anfragen
-          ausgerichtet.
-        </p>
-        <p className="text-base leading-8 text-slate-300/78 sm:text-lg">
-          Ich verbinde Design, technische Umsetzung und ein praktisches
-          Verständnis dafür, was lokale Unternehmen wirklich brauchen: einen
-          professionellen Online-Auftritt, der Vertrauen schafft und Kunden den
-          nächsten Schritt leicht macht.
-        </p>
-        <p className="max-w-3xl border-l border-[#d89b3a]/28 pl-5 text-base leading-8 text-slate-400 sm:text-lg">
-          Mein Fokus liegt auf klarer Kommunikation, sauberer Umsetzung und
-          digitalen Lösungen, die nicht nur gut aussehen, sondern im Alltag
-          funktionieren.
-        </p>
-      </div>
+    <div className="panel-editorial panel-about">
+      <p className="panel-lead">
+        Ich entwickle moderne Websites für kleine Unternehmen in Deutschland:
+        klar strukturiert, mobil optimiert und auf echte Anfragen ausgerichtet.
+      </p>
 
-      <div className="grid gap-6 border-t border-white/[0.08] pt-7 md:grid-cols-3">
-        {brandFacts.map(([number, label, text]) => (
-          <div key={label} className="space-y-4">
-            <p className="font-mono text-xs tracking-[0.24em] text-[#d89b3a]/62">
-              {number}
-            </p>
-            <h3 className="text-2xl font-semibold tracking-[-0.04em] text-[#f8f5ee]">
-              {label}
-            </h3>
-            <p className="text-sm leading-7 text-slate-400">{text}</p>
-          </div>
-        ))}
-      </div>
+      <p className="panel-copy">
+        Ich verbinde Design, technische Umsetzung und ein praktisches
+        Verständnis dafür, was lokale Unternehmen wirklich brauchen: einen
+        professionellen Online-Auftritt, der Vertrauen schafft und Kunden den
+        nächsten Schritt leicht macht.
+      </p>
+
+      <p className="panel-accent-copy">
+        Mein Fokus liegt auf klarer Kommunikation, sauberer Umsetzung und
+        digitalen Lösungen, die nicht nur gut aussehen, sondern im Alltag
+        funktionieren.
+      </p>
+
+      <dl className="panel-facts" aria-label="Arbeitsfelder">
+        <div>
+          <dt>Design</dt>
+          <dd>Ruhige visuelle Systeme, die Vertrauen schaffen.</dd>
+        </div>
+        <div>
+          <dt>Development</dt>
+          <dd>Saubere Umsetzung mit Fokus auf Geschwindigkeit.</dd>
+        </div>
+        <div>
+          <dt>AI-ready</dt>
+          <dd>Moderne Funktionen, wenn sie dem Projekt wirklich helfen.</dd>
+        </div>
+      </dl>
     </div>
   );
 }
 
 function ServicesPanel() {
   return (
-    <div className="space-y-10">
-      <p className="max-w-3xl text-lg leading-8 text-slate-300/86 sm:text-xl sm:leading-9">
+    <div className="panel-editorial">
+      <p className="panel-intro">
         Moderne Websites für lokale Unternehmen, die professionell auftreten
         und online mehr Anfragen gewinnen möchten.
       </p>
 
-      <div className="divide-y divide-white/[0.08] border-y border-white/[0.08]">
-        {services.map((service, index) => (
-          <article
-            key={service.title}
-            className="grid gap-5 py-7 md:grid-cols-[8rem_1fr] lg:grid-cols-[9rem_0.8fr_1fr]"
-          >
-            <p className="font-mono text-sm tracking-[0.3em] text-[#d89b3a]/65">
-              {String(index + 1).padStart(2, "0")}
-            </p>
-            <h3 className="text-2xl font-semibold tracking-[-0.045em] text-[#f8f5ee] sm:text-3xl">
-              {service.title}
-            </h3>
-            <p className="max-w-2xl text-base leading-8 text-slate-400">
-              {service.description}
-            </p>
+      <div className="panel-service-list">
+        {services.map((service) => (
+          <article key={service.title} className="panel-service-row">
+            <h3>{service.title}</h3>
+            <p>{service.description}</p>
+            <span aria-hidden="true">→</span>
           </article>
         ))}
       </div>
 
-      <div className="flex flex-wrap gap-x-5 gap-y-3 text-sm uppercase tracking-[0.18em] text-slate-400">
-        {serviceTypes.map((item) => (
-          <span key={item}>{item}</span>
-        ))}
-      </div>
+      <p className="panel-sector-line">{serviceTypes.join(" · ")}</p>
     </div>
   );
 }
 
 function ReferencesPanel() {
   return (
-    <div className="space-y-10">
-      <p className="max-w-3xl text-lg leading-8 text-slate-300/86 sm:text-xl sm:leading-9">
+    <div className="panel-editorial panel-references">
+      <p className="panel-intro">
         Ein Blick auf Projekte, die moderne Websites, klare Nutzerführung und
         digitale Funktionen verbinden.
       </p>
 
-      <div className="space-y-10">
+      <div className="panel-case-track" aria-label="Portfolio-Projekte">
         {caseStudies.map((project) => (
           <CaseStudy key={project.title} project={project} />
         ))}
       </div>
+
+      <p className="panel-swipe-hint" aria-hidden="true">
+        01 / 02 · Wischen, um Projekte anzusehen
+      </p>
     </div>
   );
 }
@@ -298,60 +272,47 @@ function CaseStudy({
   project: (typeof caseStudies)[number];
 }) {
   return (
-    <article className="relative overflow-hidden border-t border-[#d89b3a]/18 pt-8">
-      <div className="grid gap-8 lg:grid-cols-[1fr_18rem] lg:items-end">
-        <div className="max-w-4xl">
-          <p className="font-mono text-xs uppercase tracking-[0.28em] text-[#d89b3a]/65">
-            {project.index} / Case Study
-          </p>
-          <h3 className="mt-4 text-[clamp(2.4rem,6vw,5.25rem)] font-semibold leading-none tracking-[-0.06em] text-[#f8f5ee]">
-            {project.title}
-          </h3>
-          <p className="mt-3 text-xl font-medium tracking-[-0.03em] text-[#d89b3a] sm:text-2xl">
-            {project.subtitle}
-          </p>
-          {project.url && (
-            <a
-              href={project.url}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-3 inline-flex text-sm text-slate-400 underline decoration-[#d89b3a]/35 underline-offset-4 transition hover:text-[#f3d38a] focus:outline-none focus-visible:rounded-md focus-visible:ring-4 focus-visible:ring-[#d89b3a]/25"
-            >
-              {project.url}
-            </a>
-          )}
-          <p className="mt-6 max-w-3xl text-base leading-8 text-slate-300/86 sm:text-lg">
-            {project.description}
-          </p>
-        </div>
+    <article className="panel-case">
+      <div className="panel-case-visual" aria-hidden="true">
+        <span>PROJECT / {project.title}</span>
+        <strong>{project.title.slice(0, 2)}</strong>
+      </div>
 
-        <div className="case-visual-frame min-h-[11rem] overflow-hidden rounded-[2rem] border border-white/[0.1] bg-white/[0.025] p-6">
-          <p className="font-mono text-xs uppercase tracking-[0.28em] text-[#d89b3a]/58">
-            Portfolio
-          </p>
-          <p className="mt-8 text-5xl font-semibold tracking-[-0.08em] text-[#f8f5ee]/88">
-            {project.title}
-          </p>
+      <div className="panel-case-heading">
+        <p>Case Study</p>
+        <h3>{project.title}</h3>
+        <h4>{project.subtitle}</h4>
+      </div>
+
+      <p className="panel-case-description">{project.description}</p>
+
+      <div className="panel-case-brief">
+        <div>
+          <h5>Aufgabe</h5>
+          <p>{project.problem}</p>
+        </div>
+        <div>
+          <h5>Lösung</h5>
+          <p>{project.solution}</p>
         </div>
       </div>
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_18rem]">
-        <ul className="grid gap-4 sm:grid-cols-2">
-          {project.results.map((item) => (
-            <li
-              key={item}
-              className="border-l border-[#d89b3a]/25 pl-4 text-sm leading-7 text-slate-300"
-            >
-              {item}
-            </li>
-          ))}
-        </ul>
+      <ul className="panel-case-results">
+        {project.results.map((item) => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
 
-        <div className="flex flex-wrap content-start gap-x-4 gap-y-2 text-xs uppercase tracking-[0.18em] text-slate-400">
-          {project.tags.map((tag) => (
-            <span key={tag}>{tag}</span>
-          ))}
-        </div>
+      <div className="panel-case-footer">
+        <p className="panel-case-tags">{project.tags.join(" · ")}</p>
+        <a
+          href={project.url || "#"}
+          target={project.url ? "_blank" : undefined}
+          rel={project.url ? "noreferrer" : undefined}
+          className="panel-text-action"
+        >
+          {project.action} <span aria-hidden="true">→</span>
+        </a>
       </div>
     </article>
   );
@@ -359,86 +320,75 @@ function CaseStudy({
 
 function ContactPanel() {
   return (
-    <div className="grid gap-10 lg:grid-cols-[1fr_0.65fr] lg:items-start">
-      <div className="max-w-4xl">
-        <p className="text-2xl leading-10 text-slate-100/90 sm:text-3xl sm:leading-[1.35]">
-          Sie möchten eine moderne Website für Ihr Unternehmen? Schreiben Sie
-          mir kurz, worum es geht.
-        </p>
-        <p className="mt-6 max-w-3xl text-base leading-8 text-slate-400 sm:text-lg">
-          Ob Handwerksbetrieb, Küchenstudio, Restaurant, Salon oder lokaler
-          Service: Ich helfe dabei, einen professionellen digitalen Auftritt
-          aufzubauen und den nächsten Schritt klar zu machen.
-        </p>
+    <div className="panel-editorial panel-contact">
+      <p className="panel-lead">
+        Sie möchten eine moderne Website für Ihr Unternehmen? Schreiben Sie mir
+        kurz, worum es geht — ich melde mich mit einem klaren nächsten Schritt.
+      </p>
+      <p className="panel-copy">
+        Ob Handwerksbetrieb, Küchenstudio, Restaurant, Salon oder lokaler
+        Service: Ich helfe dabei, einen professionellen digitalen Auftritt
+        aufzubauen.
+      </p>
 
-        <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-          <a
-            href="#"
-            className="inline-flex min-h-12 items-center justify-center rounded-full border border-[#d89b3a]/34 bg-[#d89b3a]/[0.085] px-7 text-sm font-semibold uppercase tracking-[0.16em] text-[#f3d38a] shadow-[0_18px_54px_rgba(216,155,58,0.08)] transition hover:-translate-y-0.5 hover:border-[#d89b3a]/52 hover:bg-[#d89b3a]/[0.12] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#d89b3a]/25"
-          >
-            WhatsApp schreiben
-          </a>
-          <a
-            href="mailto:dimich.dn@gmail.com"
-            className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/14 bg-white/[0.032] px-7 text-sm font-semibold uppercase tracking-[0.16em] text-slate-200 transition hover:-translate-y-0.5 hover:border-[#d89b3a]/38 hover:text-[#f3d38a] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#d89b3a]/25"
-          >
-            E-Mail senden
-          </a>
-        </div>
+      <div className="panel-contact-actions">
+        <a href="#" className="panel-contact-action panel-contact-primary">
+          <span>WhatsApp schreiben</span>
+          <span aria-hidden="true">→</span>
+        </a>
+        <a
+          href="mailto:dimich.dn@gmail.com"
+          className="panel-contact-action"
+        >
+          <span>E-Mail senden</span>
+          <span aria-hidden="true">→</span>
+        </a>
       </div>
 
-      <aside className="space-y-5 border-l border-[#d89b3a]/18 pl-6">
-        <p className="font-mono text-xs uppercase tracking-[0.28em] text-[#d89b3a]/65">
-          Antwort innerhalb von 24h
-        </p>
-        {contactNotes.map(([label, value]) => (
-          <div key={label} className="space-y-1">
-            <p className="text-xs uppercase tracking-[0.18em] text-slate-500">
-              {label}
-            </p>
-            <p className="text-base leading-7 text-slate-300">{value}</p>
+      <div className="panel-contact-note">
+        <p>Antwort innerhalb von 24h</p>
+        <dl>
+          <div>
+            <dt>Start</dt>
+            <dd>Kurzes Erstgespräch</dd>
           </div>
-        ))}
-      </aside>
+          <div>
+            <dt>Fokus</dt>
+            <dd>Klare Website, mehr Vertrauen, mehr Anfragen</dd>
+          </div>
+          <div>
+            <dt>Umsetzung</dt>
+            <dd>Design, Entwicklung, Veröffentlichung</dd>
+          </div>
+        </dl>
+      </div>
     </div>
   );
 }
 
 function ImpressumPanel() {
   return (
-    <div className="max-w-4xl space-y-9 text-base leading-8 text-slate-300 sm:text-lg">
-      <section className="space-y-5 border-t border-white/[0.08] pt-7">
-        <p className="font-mono text-xs font-semibold uppercase tracking-[0.22em] text-[#d89b3a]/62">
-          Angaben gemäß § 5 TMG
-        </p>
-        <div className="text-2xl leading-9 tracking-[-0.035em] text-[#f8f5ee]">
+    <div className="panel-editorial panel-legal">
+      <section>
+        <h3>Angaben gemäß § 5 TMG</h3>
+        <div className="panel-legal-address">
           <p>DIMICH DIGITAL</p>
           <p>Dmitry K.</p>
           <p>Deutschland</p>
         </div>
       </section>
 
-      <section className="grid gap-7 border-t border-white/[0.08] pt-7 sm:grid-cols-2">
-        <div>
-          <p className="font-mono text-xs uppercase tracking-[0.22em] text-[#d89b3a]/58">
-            E-Mail
-          </p>
-          <a
-            href="mailto:dimich.dn@gmail.com"
-            className="mt-3 inline-flex text-slate-200 transition hover:text-[#f3d38a] focus:outline-none focus-visible:rounded-md focus-visible:ring-4 focus-visible:ring-[#d89b3a]/25"
-          >
-            dimich.dn@gmail.com
-          </a>
-        </div>
-        <div>
-          <p className="font-mono text-xs uppercase tracking-[0.22em] text-[#d89b3a]/58">
-            Verantwortlich für den Inhalt
-          </p>
-          <p className="mt-3 text-slate-200">Dmitry K.</p>
-        </div>
+      <section>
+        <h3>Kontakt</h3>
+        <a href="mailto:dimich.dn@gmail.com">dimich.dn@gmail.com</a>
       </section>
 
-      <p className="max-w-3xl border-l border-[#d89b3a]/24 pl-5 text-sm leading-7 text-slate-400 sm:text-base">
+      <section>
+        <h3>Verantwortlich für den Inhalt</h3>
+        <p>Dmitry K.</p>
+      </section>
+
+      <p className="panel-legal-notice">
         Hinweis: Dieses Impressum ist ein Platzhalter und wird vor der
         Veröffentlichung mit den finalen rechtlichen Angaben ergänzt.
       </p>
@@ -467,43 +417,32 @@ function PrivacyPanel() {
   ];
 
   return (
-    <div className="max-w-5xl space-y-9">
-      <div className="max-w-4xl space-y-5 text-base leading-8 text-slate-300 sm:text-lg">
-        <p className="text-2xl leading-9 text-slate-100/90">
-          Diese Datenschutzerklärung ist ein Platzhalter.
-        </p>
-        <p className="text-slate-400">
-          Auf dieser Website werden aktuell keine komplexen Tracking- oder
-          Analysefunktionen eingesetzt. Vor der Veröffentlichung wird diese
-          Datenschutzerklärung entsprechend der finalen technischen Umsetzung
-          ergänzt.
-        </p>
-      </div>
+    <div className="panel-editorial panel-legal panel-privacy">
+      <p className="panel-lead">
+        Diese Datenschutzerklärung ist ein Platzhalter.
+      </p>
+      <p className="panel-copy">
+        Auf dieser Website werden aktuell keine komplexen Tracking- oder
+        Analysefunktionen eingesetzt. Vor der Veröffentlichung wird diese
+        Datenschutzerklärung entsprechend der finalen technischen Umsetzung
+        ergänzt.
+      </p>
 
-      <div className="divide-y divide-white/[0.08] border-y border-white/[0.08]">
+      <div className="panel-privacy-sections">
         {privacySections.map((section) => (
-          <section key={section.title} className="grid gap-4 py-6 md:grid-cols-[18rem_1fr]">
-            <h3 className="text-lg font-semibold tracking-[-0.025em] text-[#f8f5ee]">
-              {section.title}
-            </h3>
-            <p className="text-sm leading-7 text-slate-400">{section.text}</p>
+          <section key={section.title}>
+            <h3>{section.title}</h3>
+            <p>{section.text}</p>
           </section>
         ))}
       </div>
 
-      <div className="space-y-3">
-        <p className="font-mono text-xs uppercase tracking-[0.22em] text-[#d89b3a]/58">
-          Kontakt
-        </p>
-        <a
-          href="mailto:dimich.dn@gmail.com"
-          className="inline-flex text-slate-200 transition hover:text-[#f3d38a] focus:outline-none focus-visible:rounded-md focus-visible:ring-4 focus-visible:ring-[#d89b3a]/25"
-        >
-          dimich.dn@gmail.com
-        </a>
-      </div>
+      <section>
+        <h3>Kontakt</h3>
+        <a href="mailto:dimich.dn@gmail.com">dimich.dn@gmail.com</a>
+      </section>
 
-      <p className="max-w-3xl border-l border-[#d89b3a]/24 pl-5 text-sm leading-7 text-slate-400 sm:text-base">
+      <p className="panel-legal-notice">
         Hinweis: Dieser Text ist ein Platzhalter und ersetzt keine rechtliche
         Prüfung.
       </p>
