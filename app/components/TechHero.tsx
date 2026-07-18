@@ -1,6 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { flushSync } from "react-dom";
 import { ContentPanel, type ActivePanel } from "./ContentPanel";
 
@@ -88,7 +94,16 @@ const navItems: Array<{
   },
 ];
 
-export function TechHero() {
+const standardNavItems = navItems.filter((item) => !item.highlight);
+const particleIndexes = Array.from({ length: 12 }, (_, index) => index);
+
+export function TechHero({
+  brandLogo,
+  videoPoster,
+}: {
+  brandLogo: ReactNode;
+  videoPoster: ReactNode;
+}) {
   const [activePanel, setActivePanel] = useState<ActivePanel | null>(null);
   const panelOpenerRef = useRef<HTMLElement | null>(null);
 
@@ -109,6 +124,10 @@ export function TechHero() {
   );
 
   const closePanel = useCallback(() => {
+    if (!activePanel) {
+      return;
+    }
+
     const opener = panelOpenerRef.current;
     const restoreFocus = () => {
       if (opener?.isConnected) {
@@ -126,7 +145,7 @@ export function TechHero() {
     } else {
       requestAnimationFrame(restoreFocus);
     }
-  }, []);
+  }, [activePanel]);
 
   useEffect(() => {
     if (!activePanel) {
@@ -167,7 +186,7 @@ export function TechHero() {
         id="top"
         className="hero-stage relative isolate min-h-screen overflow-hidden px-4 py-4 sm:px-6 lg:px-8 lg:py-5"
       >
-        <HeroBackgroundVideo />
+        <HeroBackgroundVideo poster={videoPoster} />
         <HeroBackground />
 
         <div
@@ -176,6 +195,7 @@ export function TechHero() {
           }`}
         >
           <Header
+            brandLogo={brandLogo}
             onReset={closePanel}
             onOpenPanel={openPanel}
           />
@@ -238,9 +258,11 @@ function MobileTrustAccent() {
 }
 
 function Header({
+  brandLogo,
   onReset,
   onOpenPanel,
 }: {
+  brandLogo: ReactNode;
   onReset: () => void;
   onOpenPanel: OpenPanel;
 }) {
@@ -252,11 +274,7 @@ function Header({
         aria-label="Zur Startansicht"
         className="brand-capsule brand-logo-button inline-flex items-center justify-center rounded-full focus:outline-none focus-visible:ring-4 focus-visible:ring-[#d89b3a]/25"
       >
-        <img
-          src="/images/dimich-digital-logo.png"
-          alt="DIMICH DIGITAL"
-          className="brand-logo-image"
-        />
+        {brandLogo}
       </button>
 
       <HeroNavigation onOpenPanel={onOpenPanel} />
@@ -264,20 +282,28 @@ function Header({
   );
 }
 
-function HeroBackgroundVideo() {
+function HeroBackgroundVideo({ poster }: { poster: ReactNode }) {
+  const [videoReady, setVideoReady] = useState(false);
+
   return (
     <div
       className="hero-background-video-wrap pointer-events-none fixed inset-0 z-0"
       aria-hidden="true"
     >
+      <div
+        className={`hero-background-poster ${videoReady ? "hero-background-poster-ready" : ""}`}
+      >
+        {poster}
+      </div>
       <video
         aria-hidden="true"
         autoPlay
         muted
         loop
         playsInline
-        poster="/images/hero/dimich-hero-mobile-workspace-v1.png"
         preload="metadata"
+        onLoadStart={() => setVideoReady(false)}
+        onCanPlay={() => setVideoReady(true)}
         className="hero-background-video h-full w-full object-cover"
       >
         <source
@@ -380,7 +406,6 @@ function HeroNavigation({
   const mobileMenuDialogRef = useRef<HTMLDialogElement | null>(null);
   const mobileMenuTriggerRef = useRef<HTMLButtonElement>(null);
   const restoreFocusAfterCloseRef = useRef(true);
-  const standardNavItems = navItems.filter((item) => !item.highlight);
 
   useEffect(() => {
     if (!mobileMenuOpen) {
@@ -710,7 +735,7 @@ function HeroBackground() {
         aria-hidden="true"
         className="tech-particles pointer-events-none absolute inset-0 z-[2]"
       >
-        {Array.from({ length: 12 }).map((_, index) => (
+        {particleIndexes.map((index) => (
           <span key={index} />
         ))}
       </div>

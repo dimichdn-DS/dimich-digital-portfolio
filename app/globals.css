@@ -245,16 +245,6 @@ body {
   animation: hero-reveal 720ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.brand-capsule > span {
-  position: relative;
-  z-index: 2;
-}
-
-.brand-capsule:hover span[aria-hidden="true"] {
-  background: rgba(240, 248, 255, 0.86);
-  box-shadow: 0 0 10px rgba(220, 240, 255, 0.25);
-}
-
 .brand-logo-button {
   width: 258px;
   height: 70px;
@@ -308,7 +298,36 @@ body {
   background: #05070b;
 }
 
+.hero-background-poster {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: block;
+  overflow: hidden;
+  opacity: 1;
+  visibility: visible;
+  view-transition-name: none;
+}
+
+.hero-background-poster-ready {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.hero-background-poster-picture {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.hero-background-poster-image {
+  object-fit: cover;
+  object-position: center center;
+}
+
 .hero-background-video {
+  position: relative;
+  z-index: 1;
   display: block;
   width: 100vw;
   height: 100vh;
@@ -2259,6 +2278,10 @@ body {
     object-position: 50% 50%;
   }
 
+  .hero-background-poster-image {
+    object-position: 50% 50%;
+  }
+
   .hero-title {
     font-size: clamp(2.05rem, 10vw, 3.28rem);
     line-height: 1.01;
@@ -2607,6 +2630,10 @@ body {
   .hero-background-video {
     object-position: 50% 50%;
   }
+
+  .hero-background-poster-image {
+    object-position: 50% 50%;
+  }
 }
 
 @media (min-width: 1280px) and (max-width: 1599px) {
@@ -2618,6 +2645,10 @@ body {
   .hero-background-video {
     object-position: 50% 48%;
   }
+
+  .hero-background-poster-image {
+    object-position: 50% 48%;
+  }
 }
 
 @media (min-width: 1600px) {
@@ -2627,6 +2658,10 @@ body {
   }
 
   .hero-background-video {
+    object-position: 50% 45%;
+  }
+
+  .hero-background-poster-image {
     object-position: 50% 45%;
   }
 }
@@ -2662,11 +2697,16 @@ body {
   .hero-background-video-wrap {
     background:
       linear-gradient(180deg, rgba(5, 6, 8, 0.22), rgba(5, 6, 8, 0.36)),
-      url("/images/hero/dimich-hero-mobile-workspace-v1.png") center center / cover no-repeat;
+      #05070b;
   }
 
   .hero-background-video {
     opacity: 0;
+  }
+
+  .hero-background-poster-ready {
+    opacity: 1;
+    visibility: visible;
   }
 
   .mobile-menu-dialog::backdrop,
@@ -2707,9 +2747,6 @@ body {
 .tech-particles span:nth-child(10) { left: 55%; top: 33%; animation-delay: 1800ms; }
 .tech-particles span:nth-child(11) { left: 68%; top: 82%; animation-delay: 1100ms; }
 .tech-particles span:nth-child(12) { left: 81%; top: 48%; animation-delay: 2800ms; }
-.tech-particles span:nth-child(13) { left: 43%; top: 58%; animation-delay: 3500ms; }
-.tech-particles span:nth-child(14) { left: 91%; top: 76%; animation-delay: 500ms; }
-
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
