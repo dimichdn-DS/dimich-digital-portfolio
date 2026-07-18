@@ -76,8 +76,8 @@ const caseStudies = [
   {
     title: "STEINOutlet",
     subtitle: "AI Kitchen Visualization Platform",
-    url: "",
-    action: "Case Study ansehen",
+    url: "https://kitchen-manufaktur.vercel.app",
+    action: "Live Demo ansehen",
     description:
       "Eine moderne digitale Plattform für Küchenarbeitsplatten mit AI-gestützter Visualisierung.",
     problem:
@@ -96,7 +96,7 @@ const caseStudies = [
     title: "AURA",
     subtitle: "Premium Nail Studio Landing Page",
     url: "https://aura-landing-two-zeta.vercel.app",
-    action: "Website ansehen",
+    action: "Live Demo ansehen",
     description:
       "Dark elegant landing page for a nail studio with video hero, multilingual structure, booking CTA and mobile-first layout.",
     problem:
@@ -153,6 +153,7 @@ export function ContentPanel({
           <button
             type="button"
             onClick={onClose}
+            autoFocus={activePanel === "references"}
             className="content-panel-close"
             aria-label="Panel schließen"
           >
@@ -306,9 +307,10 @@ function CaseStudy({
       <div className="panel-case-footer">
         <p className="panel-case-tags">{project.tags.join(" · ")}</p>
         <a
-          href={project.url || "#"}
-          target={project.url ? "_blank" : undefined}
-          rel={project.url ? "noreferrer" : undefined}
+          href={project.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`${project.title} Live Demo in neuem Tab öffnen`}
           className="panel-text-action"
         >
           {project.action} <span aria-hidden="true">→</span>
