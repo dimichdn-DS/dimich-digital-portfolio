@@ -371,6 +371,10 @@ body {
 .content-panel-close:focus-visible,
 .panel-text-action:focus-visible,
 .panel-contact-action:focus-visible,
+.panel-briefing-field input:focus-visible,
+.panel-briefing-field select:focus-visible,
+.panel-briefing-field textarea:focus-visible,
+.panel-briefing-submit:focus-visible,
 .panel-legal a:focus-visible {
   outline: 2px solid rgba(232, 189, 107, 0.88);
   outline-offset: 4px;
@@ -725,6 +729,180 @@ body {
 
 .panel-contact {
   max-width: 850px;
+}
+
+.panel-briefing-form {
+  margin-top: 42px;
+  padding-top: 30px;
+  border-top: 1px solid rgba(216, 155, 58, 0.25);
+}
+
+.panel-briefing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px 28px;
+}
+
+.panel-briefing-field {
+  min-width: 0;
+}
+
+.panel-briefing-field-wide {
+  grid-column: 1 / -1;
+}
+
+.panel-briefing-field label {
+  display: block;
+  margin-bottom: 9px;
+  color: rgba(232, 189, 107, 0.82);
+  font-size: 0.68rem;
+  font-weight: 650;
+  letter-spacing: 0.11em;
+  line-height: 1.45;
+  text-transform: uppercase;
+}
+
+.panel-briefing-field input,
+.panel-briefing-field select,
+.panel-briefing-field textarea {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 5px;
+  background: rgba(7, 8, 9, 0.3);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+  color: rgba(245, 241, 233, 0.92);
+  font: inherit;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.panel-briefing-field input,
+.panel-briefing-field select {
+  min-height: 50px;
+  padding: 0 14px;
+}
+
+.panel-briefing-field textarea {
+  min-height: 138px;
+  max-height: 260px;
+  padding: 13px 14px;
+  resize: vertical;
+}
+
+.panel-briefing-field input::placeholder,
+.panel-briefing-field textarea::placeholder {
+  color: rgba(207, 202, 193, 0.43);
+  opacity: 1;
+}
+
+.panel-briefing-field select {
+  color-scheme: dark;
+}
+
+.panel-briefing-field select option {
+  background: #121314;
+  color: #f0ece3;
+}
+
+.panel-briefing-field input:hover,
+.panel-briefing-field select:hover,
+.panel-briefing-field textarea:hover {
+  border-color: rgba(216, 155, 58, 0.3);
+}
+
+.panel-briefing-field input:focus,
+.panel-briefing-field select:focus,
+.panel-briefing-field textarea:focus {
+  border-color: rgba(232, 189, 107, 0.7);
+  background: rgba(9, 10, 11, 0.42);
+  box-shadow:
+    0 0 0 3px rgba(216, 155, 58, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.panel-briefing-field [aria-invalid="true"] {
+  border-color: rgba(232, 139, 104, 0.75);
+}
+
+.panel-briefing-error {
+  margin: 8px 0 0;
+  color: rgba(246, 174, 145, 0.92);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.panel-briefing-error::before {
+  content: "! ";
+  font-weight: 700;
+}
+
+.panel-briefing-actions {
+  display: flex;
+  align-items: stretch;
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.panel-briefing-submit {
+  display: inline-flex;
+  min-height: 50px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 0 20px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 4px;
+  background: rgba(8, 9, 10, 0.3);
+  color: rgba(242, 238, 230, 0.86);
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.1em;
+  line-height: 1.3;
+  text-align: left;
+  text-transform: uppercase;
+  transition:
+    color 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.panel-briefing-submit-primary {
+  border-color: rgba(216, 155, 58, 0.42);
+  color: #e8bd6b;
+}
+
+.panel-briefing-submit:not(:disabled):hover {
+  border-color: rgba(232, 189, 107, 0.64);
+  background: rgba(216, 155, 58, 0.07);
+  color: #f1cf8c;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+}
+
+.panel-briefing-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+.panel-briefing-submit span {
+  flex: none;
+  transition: transform 180ms ease;
+}
+
+.panel-briefing-submit:not(:disabled):hover span {
+  transform: translateX(4px);
+}
+
+.panel-briefing-privacy {
+  max-width: 700px;
+  margin: 12px 0 0;
+  color: rgba(199, 194, 185, 0.55);
+  font-size: 0.72rem;
+  line-height: 1.6;
 }
 
 .panel-contact-actions {
@@ -1796,6 +1974,40 @@ body {
 
   .panel-contact-actions {
     margin-top: 34px;
+  }
+
+  .panel-briefing-form {
+    margin-top: 32px;
+    padding-top: 24px;
+  }
+
+  .panel-briefing-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .panel-briefing-field-wide {
+    grid-column: auto;
+  }
+
+  .panel-briefing-field input,
+  .panel-briefing-field select {
+    min-height: 48px;
+  }
+
+  .panel-briefing-field textarea {
+    min-height: 132px;
+  }
+
+  .panel-briefing-actions {
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 24px;
+  }
+
+  .panel-briefing-submit {
+    width: 100%;
+    min-height: 48px;
   }
 
   .panel-contact-action {

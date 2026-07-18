@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+
 export type ActivePanel =
   | "about"
   | "services"
@@ -113,6 +117,30 @@ const caseStudies = [
   },
 ];
 
+const contactServices = [
+  "Neue Website",
+  "Website-Redesign",
+  "Landingpage",
+  "Google Maps / lokale Sichtbarkeit",
+  "Wartung oder technische Hilfe",
+  "Noch nicht sicher",
+];
+
+const contactBudgets = [
+  "Noch offen",
+  "Bis 1.000 €",
+  "1.000–2.500 €",
+  "2.500–5.000 €",
+  "Über 5.000 €",
+];
+
+type BriefingField = "name" | "company" | "service" | "description";
+type BriefingErrors = Partial<Record<BriefingField, string>>;
+type BriefingChannel = "whatsapp" | "email";
+
+const CONTACT_EMAIL = "dimich.dn@gmail.com";
+const WHATSAPP_URL = "https://wa.me/49784442215";
+
 export function ContentPanel({
   activePanel,
   onClose,
@@ -120,6 +148,27 @@ export function ContentPanel({
   activePanel: ActivePanel | null;
   onClose: () => void;
 }) {
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
+
+  useEffect(() => {
+    if (activePanel !== "contact") {
+      return;
+    }
+
+    const opener =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+
+    closeButtonRef.current?.focus({ preventScroll: true });
+
+    return () => {
+      if (opener?.isConnected) {
+        opener.focus({ preventScroll: true });
+      }
+    };
+  }, [activePanel]);
+
   if (!activePanel) {
     return null;
   }
@@ -151,6 +200,7 @@ export function ContentPanel({
           </div>
 
           <button
+            ref={closeButtonRef}
             type="button"
             onClick={onClose}
             autoFocus={activePanel === "references"}
@@ -321,6 +371,119 @@ function CaseStudy({
 }
 
 function ContactPanel() {
+  const formRef = useRef<HTMLFormElement | null>(null);
+  const nameRef = useRef<HTMLInputElement | null>(null);
+  const companyRef = useRef<HTMLInputElement | null>(null);
+  const serviceRef = useRef<HTMLSelectElement | null>(null);
+  const descriptionRef = useRef<HTMLTextAreaElement | null>(null);
+  const [errors, setErrors] = useState<BriefingErrors>({});
+
+  function clearError(field: BriefingField) {
+    setErrors((current) => {
+      if (!current[field]) {
+        return current;
+      }
+
+      const next = { ...current };
+      delete next[field];
+      return next;
+    });
+  }
+
+  function prepareBriefingMessage() {
+    const form = formRef.current;
+
+    if (!form) {
+      return null;
+    }
+
+    const formData = new FormData(form);
+    const values = {
+      name: String(formData.get("name") ?? "").trim(),
+      company: String(formData.get("company") ?? "").trim(),
+      service: String(formData.get("service") ?? "").trim(),
+      budget: String(formData.get("budget") ?? "Noch offen").trim(),
+      description: String(formData.get("description") ?? "").trim(),
+    };
+    const nextErrors: BriefingErrors = {};
+
+    if (!values.name) {
+      nextErrors.name = "Bitte geben Sie Ihren Namen ein.";
+    }
+
+    if (!values.company) {
+      nextErrors.company =
+        "Bitte geben Sie Ihr Unternehmen oder Ihre Branche ein.";
+    }
+
+    if (!values.service) {
+      nextErrors.service = "Bitte wählen Sie eine Leistung aus.";
+    }
+
+    if (!values.description) {
+      nextErrors.description = "Bitte beschreiben Sie kurz Ihr Projekt.";
+    }
+
+    setErrors(nextErrors);
+
+    const firstInvalidField = (
+      ["name", "company", "service", "description"] as BriefingField[]
+    ).find((field) => nextErrors[field]);
+
+    if (firstInvalidField) {
+      const fieldRefs = {
+        name: nameRef,
+        company: companyRef,
+        service: serviceRef,
+        description: descriptionRef,
+      };
+
+      requestAnimationFrame(() => {
+        fieldRefs[firstInvalidField].current?.focus({ preventScroll: false });
+      });
+      return null;
+    }
+
+    const message = [
+      "Hallo, ich interessiere mich für eine Website.",
+      "",
+      `Name: ${values.name}`,
+      `Unternehmen / Branche: ${values.company}`,
+      `Benötigt: ${values.service}`,
+      `Budget: ${values.budget || "Noch offen"}`,
+      "",
+      "Projektbeschreibung:",
+      values.description,
+      "",
+      "Quelle:",
+      "DIMICH DIGITAL Website",
+    ].join("\n");
+    return message;
+  }
+
+  function sendBriefing(channel: BriefingChannel) {
+    const message = prepareBriefingMessage();
+
+    if (!message) {
+      return;
+    }
+
+    if (channel === "whatsapp") {
+      const link = document.createElement("a");
+
+      link.href = `${WHATSAPP_URL}?text=${encodeURIComponent(message)}`;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.click();
+      return;
+    }
+
+    const subject = "Projektanfrage über DIMICH DIGITAL";
+    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
+      subject,
+    )}&body=${encodeURIComponent(message)}`;
+  }
+
   return (
     <div className="panel-editorial panel-contact">
       <p className="panel-lead">
@@ -333,19 +496,173 @@ function ContactPanel() {
         aufzubauen.
       </p>
 
-      <div className="panel-contact-actions">
-        <a href="#" className="panel-contact-action panel-contact-primary">
-          <span>WhatsApp schreiben</span>
-          <span aria-hidden="true">→</span>
-        </a>
-        <a
-          href="mailto:dimich.dn@gmail.com"
-          className="panel-contact-action"
-        >
-          <span>E-Mail senden</span>
-          <span aria-hidden="true">→</span>
-        </a>
-      </div>
+      <form
+        ref={formRef}
+        className="panel-briefing-form"
+        noValidate
+        onSubmit={(event) => event.preventDefault()}
+      >
+        <div className="panel-briefing-grid">
+          <div className="panel-briefing-field">
+            <label htmlFor="briefing-name">Ihr Name</label>
+            <input
+              ref={nameRef}
+              id="briefing-name"
+              name="name"
+              type="text"
+              required
+              autoComplete="name"
+              placeholder="Vor- und Nachname"
+              aria-invalid={errors.name ? "true" : undefined}
+              aria-describedby={
+                errors.name ? "briefing-name-error" : undefined
+              }
+              onChange={() => clearError("name")}
+            />
+            {errors.name && (
+              <p
+                id="briefing-name-error"
+                className="panel-briefing-error"
+                role="alert"
+              >
+                {errors.name}
+              </p>
+            )}
+          </div>
+
+          <div className="panel-briefing-field">
+            <label htmlFor="briefing-company">Unternehmen oder Branche</label>
+            <input
+              ref={companyRef}
+              id="briefing-company"
+              name="company"
+              type="text"
+              required
+              autoComplete="organization"
+              placeholder="Zum Beispiel Handwerksbetrieb, Salon, Restaurant"
+              aria-invalid={errors.company ? "true" : undefined}
+              aria-describedby={
+                errors.company ? "briefing-company-error" : undefined
+              }
+              onChange={() => clearError("company")}
+            />
+            {errors.company && (
+              <p
+                id="briefing-company-error"
+                className="panel-briefing-error"
+                role="alert"
+              >
+                {errors.company}
+              </p>
+            )}
+          </div>
+
+          <div className="panel-briefing-field">
+            <label htmlFor="briefing-service">Was wird benötigt?</label>
+            <select
+              ref={serviceRef}
+              id="briefing-service"
+              name="service"
+              required
+              defaultValue=""
+              aria-invalid={errors.service ? "true" : undefined}
+              aria-describedby={
+                errors.service ? "briefing-service-error" : undefined
+              }
+              onChange={() => clearError("service")}
+            >
+              <option value="" disabled>
+                Bitte auswählen
+              </option>
+              {contactServices.map((service) => (
+                <option key={service} value={service}>
+                  {service}
+                </option>
+              ))}
+            </select>
+            {errors.service && (
+              <p
+                id="briefing-service-error"
+                className="panel-briefing-error"
+                role="alert"
+              >
+                {errors.service}
+              </p>
+            )}
+          </div>
+
+          <div className="panel-briefing-field">
+            <label htmlFor="briefing-budget">Geplanter Budget-Rahmen</label>
+            <select
+              id="briefing-budget"
+              name="budget"
+              defaultValue="Noch offen"
+            >
+              {contactBudgets.map((budget) => (
+                <option key={budget} value={budget}>
+                  {budget}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="panel-briefing-field panel-briefing-field-wide">
+            <label htmlFor="briefing-description">
+              Worum geht es bei Ihrem Projekt?
+            </label>
+            <textarea
+              ref={descriptionRef}
+              id="briefing-description"
+              name="description"
+              required
+              rows={5}
+              maxLength={1200}
+              placeholder="Beschreiben Sie kurz Ihr Unternehmen, Ihr Ziel und was die neue Website erreichen soll."
+              aria-invalid={errors.description ? "true" : undefined}
+              aria-describedby={
+                errors.description
+                  ? "briefing-description-error"
+                  : undefined
+              }
+              onChange={() => clearError("description")}
+            />
+            {errors.description && (
+              <p
+                id="briefing-description-error"
+                className="panel-briefing-error"
+                role="alert"
+              >
+                {errors.description}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="panel-briefing-actions">
+          <button
+            type="button"
+            className="panel-briefing-submit panel-briefing-submit-primary"
+            onClick={() => sendBriefing("whatsapp")}
+          >
+            Per WhatsApp senden
+            <span aria-hidden="true">→</span>
+          </button>
+          <button
+            type="button"
+            className="panel-briefing-submit"
+            onClick={() => sendBriefing("email")}
+          >
+            Per E-Mail senden
+            <span aria-hidden="true">→</span>
+          </button>
+        </div>
+
+        <p className="panel-briefing-privacy">
+          Mit dem Absenden wird nur eine Nachricht in WhatsApp oder im
+          E-Mail-Programm vorbereitet. Es werden keine Daten auf dieser Website
+          gespeichert.
+        </p>
+      </form>
 
       <div className="panel-contact-note">
         <p>Antwort innerhalb von 24h</p>

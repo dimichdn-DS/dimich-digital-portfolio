@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { ContentPanel, type ActivePanel } from "./ContentPanel";
 
+const WHATSAPP_URL = "https://wa.me/49784442215";
+
 const heroCopy = {
   subtitle:
     "Moderne Websites, digitale Lösungen und klare Online-Auftritte für kleine Unternehmen in Deutschland.",
@@ -410,15 +412,16 @@ function HeroNavigation({
         >
           Menü
         </button>
-        <button
-          type="button"
-          onClick={() => openMobilePanel("contact")}
+        <a
+          href={WHATSAPP_URL}
+          target="_blank"
+          rel="noopener noreferrer"
           className="mobile-whatsapp-button"
-          aria-label="WhatsApp"
+          aria-label="WhatsApp-Chat in neuem Tab öffnen"
           title="WhatsApp"
         >
           <WhatsAppIcon />
-        </button>
+        </a>
       </div>
 
       <dialog
@@ -504,22 +507,42 @@ function HeroNavigation({
       </dialog>
 
       <div className="hidden lg:flex lg:w-auto lg:max-w-none lg:flex-wrap lg:justify-end lg:gap-3">
-        {navItems.map((item) => (
-          <button
-            key={`${item.label}-${item.panel}`}
-            type="button"
-            onClick={() => onOpenPanel(item.panel)}
-            className={`hero-nav-pill ${item.highlight ? "hero-nav-pill-accent" : ""}`}
-          >
-            <span
-              aria-hidden="true"
-              className={`hero-nav-icon ${item.highlight ? "hero-nav-whatsapp-icon" : ""}`}
+        {navItems.map((item) => {
+          const content = (
+            <>
+              <span
+                aria-hidden="true"
+                className={`hero-nav-icon ${item.highlight ? "hero-nav-whatsapp-icon" : ""}`}
+              >
+                {item.highlight ? <WhatsAppIcon /> : item.icon}
+              </span>
+              <span>{item.label}</span>
+            </>
+          );
+          const className = `hero-nav-pill ${item.highlight ? "hero-nav-pill-accent" : ""}`;
+
+          return item.highlight ? (
+            <a
+              key={`${item.label}-${item.panel}`}
+              href={WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="WhatsApp-Chat in neuem Tab öffnen"
+              className={className}
             >
-              {item.highlight ? <WhatsAppIcon /> : item.icon}
-            </span>
-            <span>{item.label}</span>
-          </button>
-        ))}
+              {content}
+            </a>
+          ) : (
+            <button
+              key={`${item.label}-${item.panel}`}
+              type="button"
+              onClick={() => onOpenPanel(item.panel)}
+              className={className}
+            >
+              {content}
+            </button>
+          );
+        })}
       </div>
     </nav>
   );
