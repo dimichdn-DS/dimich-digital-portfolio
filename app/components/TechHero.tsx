@@ -1,9 +1,51 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { ContentPanel, type ActivePanel } from "./ContentPanel";
 
 const WHATSAPP_URL = "https://wa.me/49784442215";
+
+type ProgressiveViewTransition = {
+  finished: Promise<void>;
+};
+
+type ViewTransitionDocument = Document & {
+  startViewTransition?: (
+    updateCallback: () => void,
+  ) => ProgressiveViewTransition;
+};
+
+type OpenPanelOptions = {
+  beforeUpdate?: () => void;
+  returnFocusTo?: HTMLElement | null;
+};
+
+type OpenPanel = (panel: ActivePanel, options?: OpenPanelOptions) => void;
+
+function runProgressiveViewTransition(update: () => void) {
+  const viewTransitionDocument = document as ViewTransitionDocument;
+  const reduceMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+
+  if (!viewTransitionDocument.startViewTransition || reduceMotion) {
+    update();
+    return null;
+  }
+
+  document.documentElement.dataset.viewTransitions = "enabled";
+
+  try {
+    return viewTransitionDocument.startViewTransition(() => {
+      flushSync(update);
+    });
+  } catch {
+    delete document.documentElement.dataset.viewTransitions;
+    update();
+    return null;
+  }
+}
 
 const heroCopy = {
   subtitle:
@@ -48,6 +90,43 @@ const navItems: Array<{
 
 export function TechHero() {
   const [activePanel, setActivePanel] = useState<ActivePanel | null>(null);
+  const panelOpenerRef = useRef<HTMLElement | null>(null);
+
+  const openPanel = useCallback(
+    (panel: ActivePanel, options?: OpenPanelOptions) => {
+      panelOpenerRef.current =
+        options?.returnFocusTo ??
+        (document.activeElement instanceof HTMLElement
+          ? document.activeElement
+          : null);
+
+      runProgressiveViewTransition(() => {
+        options?.beforeUpdate?.();
+        setActivePanel(panel);
+      });
+    },
+    [],
+  );
+
+  const closePanel = useCallback(() => {
+    const opener = panelOpenerRef.current;
+    const restoreFocus = () => {
+      if (opener?.isConnected) {
+        opener.focus({ preventScroll: true });
+      }
+
+      panelOpenerRef.current = null;
+    };
+    const transition = runProgressiveViewTransition(() => {
+      setActivePanel(null);
+    });
+
+    if (transition) {
+      void transition.finished.then(restoreFocus, restoreFocus);
+    } else {
+      requestAnimationFrame(restoreFocus);
+    }
+  }, []);
 
   useEffect(() => {
     if (!activePanel) {
@@ -56,12 +135,30 @@ export function TechHero() {
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
-        setActivePanel(null);
+        closePanel();
       }
     }
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activePanel, closePanel]);
+
+  useEffect(() => {
+    if (!activePanel) {
+      return;
+    }
+
+    const { body, documentElement } = document;
+    const previousHtmlOverflow = documentElement.style.overflow;
+    const previousBodyOverflow = body.style.overflow;
+
+    documentElement.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+
+    return () => {
+      documentElement.style.overflow = previousHtmlOverflow;
+      body.style.overflow = previousBodyOverflow;
+    };
   }, [activePanel]);
 
   return (
@@ -79,21 +176,21 @@ export function TechHero() {
           }`}
         >
           <Header
-            onReset={() => setActivePanel(null)}
-            onOpenPanel={setActivePanel}
+            onReset={closePanel}
+            onOpenPanel={openPanel}
           />
 
           <div className="hero-main-slot relative flex flex-1 flex-col justify-center py-3 sm:py-10 lg:py-8">
-            <HeroContent onOpenPanel={setActivePanel} />
+            <HeroContent onOpenPanel={openPanel} />
             <MobileTrustAccent />
           </div>
 
-          <HeroFooter onOpenPanel={setActivePanel} />
+          <HeroFooter onOpenPanel={openPanel} />
         </div>
 
         <ContentPanel
           activePanel={activePanel}
-          onClose={() => setActivePanel(null)}
+          onClose={closePanel}
         />
       </section>
     </main>
@@ -103,7 +200,7 @@ export function TechHero() {
 function HeroFooter({
   onOpenPanel,
 }: {
-  onOpenPanel: (panel: ActivePanel) => void;
+  onOpenPanel: OpenPanel;
 }) {
   return (
     <footer className="hero-legal-footer hero-reveal pb-3 text-center font-mono text-[0.68rem] uppercase tracking-[0.28em] text-white/36">
@@ -145,7 +242,7 @@ function Header({
   onOpenPanel,
 }: {
   onReset: () => void;
-  onOpenPanel: (panel: ActivePanel) => void;
+  onOpenPanel: OpenPanel;
 }) {
   return (
     <header className="hero-reveal flex items-center justify-between gap-3 pt-1 lg:pt-3">
@@ -201,7 +298,7 @@ function HeroBackgroundVideo() {
 function HeroContent({
   onOpenPanel,
 }: {
-  onOpenPanel: (panel: ActivePanel) => void;
+  onOpenPanel: OpenPanel;
 }) {
   return (
     <div className="hero-core hero-reveal hero-reveal-delay-1 relative z-10 mx-auto flex w-full max-w-[1140px] items-center justify-center overflow-hidden px-5 py-6 text-center sm:px-10 sm:py-12 lg:min-h-[500px] lg:px-16 lg:py-12">
@@ -277,7 +374,7 @@ function HeroContent({
 function HeroNavigation({
   onOpenPanel,
 }: {
-  onOpenPanel: (panel: ActivePanel) => void;
+  onOpenPanel: OpenPanel;
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const mobileMenuDialogRef = useRef<HTMLDialogElement | null>(null);
@@ -356,7 +453,7 @@ function HeroNavigation({
       );
   }, []);
 
-  function closeMobileMenu(restoreFocus = true) {
+  function closeMobileMenuImmediately(restoreFocus = true) {
     const dialog = mobileMenuDialogRef.current;
 
     restoreFocusAfterCloseRef.current = restoreFocus;
@@ -370,6 +467,12 @@ function HeroNavigation({
     setMobileMenuOpen(false);
   }
 
+  function closeMobileMenu(restoreFocus = true) {
+    runProgressiveViewTransition(() => {
+      closeMobileMenuImmediately(restoreFocus);
+    });
+  }
+
   function openMobileMenu() {
     const dialog = mobileMenuDialogRef.current;
 
@@ -378,8 +481,10 @@ function HeroNavigation({
     }
 
     restoreFocusAfterCloseRef.current = true;
-    dialog.showModal();
-    setMobileMenuOpen(dialog.open);
+    runProgressiveViewTransition(() => {
+      dialog.showModal();
+      setMobileMenuOpen(dialog.open);
+    });
   }
 
   function handleMobileMenuClosed() {
@@ -393,8 +498,10 @@ function HeroNavigation({
   }
 
   function openMobilePanel(panel: ActivePanel) {
-    closeMobileMenu(false);
-    onOpenPanel(panel);
+    onOpenPanel(panel, {
+      beforeUpdate: () => closeMobileMenuImmediately(false),
+      returnFocusTo: mobileMenuTriggerRef.current,
+    });
   }
 
   return (
@@ -432,6 +539,12 @@ function HeroNavigation({
         onCancel={(event) => {
           event.preventDefault();
           closeMobileMenu();
+        }}
+        onKeyDown={(event) => {
+          if (event.key === "Escape") {
+            event.preventDefault();
+            closeMobileMenu();
+          }
         }}
         onClick={(event) => {
           const dialog = mobileMenuDialogRef.current;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 export type ActivePanel =
   | "about"
@@ -150,25 +150,6 @@ export function ContentPanel({
 }) {
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
 
-  useEffect(() => {
-    if (activePanel !== "contact") {
-      return;
-    }
-
-    const opener =
-      document.activeElement instanceof HTMLElement
-        ? document.activeElement
-        : null;
-
-    closeButtonRef.current?.focus({ preventScroll: true });
-
-    return () => {
-      if (opener?.isConnected) {
-        opener.focus({ preventScroll: true });
-      }
-    };
-  }, [activePanel]);
-
   if (!activePanel) {
     return null;
   }
@@ -203,7 +184,7 @@ export function ContentPanel({
             ref={closeButtonRef}
             type="button"
             onClick={onClose}
-            autoFocus={activePanel === "references"}
+            autoFocus
             className="content-panel-close"
             aria-label="Panel schließen"
           >
