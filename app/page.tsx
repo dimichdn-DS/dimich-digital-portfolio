@@ -16,12 +16,12 @@ export default function Home() {
   const videoPoster = (
     <picture className="hero-background-poster-picture">
       <source
-        media="(min-width: 1024px)"
+        media="(min-width: 768px)"
         srcSet={desktopPosterSrcSet}
         sizes="100vw"
       />
       <Image
-        src="/images/hero/dimich-hero-mobile-workspace-v1.png"
+        src="/images/hero/kpts-werk/kpts-werk-office-final-v2-mobile-9x16.png"
         alt=""
         fill
         sizes="100vw"

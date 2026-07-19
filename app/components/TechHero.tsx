@@ -337,6 +337,7 @@ function HeroBackgroundVideo({ poster }: { poster: ReactNode }) {
       </div>
       <video
         aria-hidden="true"
+        tabIndex={-1}
         autoPlay
         muted
         loop
@@ -347,14 +348,14 @@ function HeroBackgroundVideo({ poster }: { poster: ReactNode }) {
         className="hero-background-video h-full w-full object-cover"
       >
         <source
-          src="/videos/hero/dimich-hero-desktop-workspace-loop-v1.mp4"
+          src="/videos/kpts-werk-office-desktop.mp4"
           type="video/mp4"
-          media="(min-width: 1024px)"
+          media="(prefers-reduced-motion: no-preference) and (min-width: 768px)"
         />
         <source
-          src="/videos/hero/dimich-hero-mobile-workspace-loop-v1.mp4"
+          src="/videos/kpts-werk-office-mobile.mp4"
           type="video/mp4"
-          media="(max-width: 1023px)"
+          media="(prefers-reduced-motion: no-preference) and (max-width: 767px)"
         />
       </video>
     </div>
