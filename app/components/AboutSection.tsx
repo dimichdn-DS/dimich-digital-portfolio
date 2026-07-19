@@ -68,7 +68,7 @@ export function AboutSection() {
         </div>
 
         <aside
-          aria-label="DIMICH DIGITAL Profil"
+          aria-label="KPTS WERK Profil"
           className="hero-reveal hero-reveal-delay-1 group relative overflow-hidden rounded-[1.65rem] border border-[#d89b3a]/14 bg-white/[0.032] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.34),0_0_44px_rgba(216,155,58,0.06),inset_0_0_42px_rgba(216,155,58,0.022)] backdrop-blur-xl transition-[transform,border-color,background-color,box-shadow] duration-300 hover:-translate-y-1 hover:border-[#d89b3a]/28 hover:bg-[#d89b3a]/[0.045] hover:shadow-[0_30px_92px_rgba(0,0,0,0.38),0_0_58px_rgba(216,155,58,0.09),inset_0_0_48px_rgba(216,155,58,0.035)] sm:p-6 lg:p-7"
         >
           <div
@@ -83,7 +83,7 @@ export function AboutSection() {
           <div className="relative flex items-center justify-between gap-4">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#d89b3a]/68">
-                DIMICH DIGITAL
+                KPTS WERK
               </p>
               <p className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-slate-50">
                 Web Developer

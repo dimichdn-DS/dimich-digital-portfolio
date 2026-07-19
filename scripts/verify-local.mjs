@@ -43,8 +43,8 @@ if (!page.ok) {
   fail(`HTML returned HTTP ${page.status}`);
 }
 
-if (!page.text.includes("DIMICH DIGITAL")) {
-  fail("HTML does not contain DIMICH DIGITAL");
+if (!page.text.includes("KPTS WERK")) {
+  fail("HTML does not contain KPTS WERK");
 }
 
 const cssAssets = findCssAssets(page.text);
@@ -74,7 +74,7 @@ if (!hasTailwindUtilities) {
 }
 
 if (!hasCustomTheme) {
-  fail("CSS asset does not contain DIMICH DIGITAL custom dark theme styles");
+  fail("CSS asset does not contain KPTS WERK custom dark theme styles");
 }
 
 console.log("HTML OK");

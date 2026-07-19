@@ -1,4 +1,4 @@
-# DIMICH DIGITAL
+# KPTS WERK
 
 Portfolio website is being built.
 

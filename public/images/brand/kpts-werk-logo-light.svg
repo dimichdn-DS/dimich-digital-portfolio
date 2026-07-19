@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="300" viewBox="0 0 1200 300" role="img" aria-labelledby="title desc">
+  <title id="title">KPTS WERK</title>
+  <desc id="desc">KPTS WERK — Digitale Lösungen für lokale Unternehmen</desc>
+
+  <g fill="none" stroke="#F3F0E8" stroke-width="14" stroke-linecap="square" stroke-linejoin="round">
+    <!-- K -->
+    <path d="M60 48 V178" />
+    <path d="M150 48 L82 112 L150 178" />
+
+    <!-- P -->
+    <path d="M230 178 V48 H312
+             C355 48 378 70 378 102
+             C378 134 355 156 312 156
+             H230" />
+
+    <!-- T -->
+    <path d="M445 48 H625" />
+    <path d="M535 48 V178" />
+
+    <!-- stylized S -->
+    <path d="M840 48 H774
+             C732 48 708 72 708 104
+             C708 136 732 158 774 158
+             H800" />
+    <path d="M800 158
+             C828 158 844 175 844 198
+             C844 218 832 233 814 240" />
+  </g>
+
+  <!-- separator -->
+  <rect x="885" y="42" width="3" height="146" rx="1.5" fill="#C7A05A"/>
+
+  <!-- WERK -->
+  <text x="930" y="145"
+        fill="#F3F0E8"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="58"
+        font-weight="400"
+        letter-spacing="18">WERK</text>
+
+  <!-- tagline -->
+  <text x="60" y="267"
+        fill="#D7D2C8"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="24"
+        font-weight="400"
+        letter-spacing="5">DIGITALE LÖSUNGEN FÜR LOKALE UNTERNEHMEN</text>
+</svg>

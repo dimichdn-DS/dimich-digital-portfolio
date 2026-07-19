@@ -55,7 +55,7 @@ function runProgressiveViewTransition(update: () => void) {
 
 const heroCopy = {
   subtitle:
-    "Moderne Websites, digitale Lösungen und klare Online-Auftritte für kleine Unternehmen in Deutschland.",
+    "Moderne Websites, klare Online-Auftritte und digitale Werkzeuge für kleine Unternehmen in Deutschland.",
   description:
     "Ich entwickle schnelle, hochwertige und mobil optimierte Websites, die professionell wirken und aus Besuchern echte Anfragen machen.",
 };
@@ -63,38 +63,26 @@ const heroCopy = {
 const navItems: Array<{
   label: string;
   panel: ActivePanel;
-  icon: string;
-  highlight?: boolean;
 }> = [
   {
     label: "Über mich",
     panel: "about",
-    icon: "·",
   },
   {
     label: "Leistungen",
     panel: "services",
-    icon: "+",
   },
   {
     label: "Referenzen",
     panel: "references",
-    icon: "★",
   },
   {
     label: "Kontakt",
     panel: "contact",
-    icon: "→",
-  },
-  {
-    label: "WhatsApp",
-    panel: "contact",
-    icon: "☎",
-    highlight: true,
   },
 ];
 
-const standardNavItems = navItems.filter((item) => !item.highlight);
+const standardNavItems = navItems;
 const particleIndexes = Array.from({ length: 12 }, (_, index) => index);
 
 export function TechHero({
@@ -105,6 +93,7 @@ export function TechHero({
   videoPoster: ReactNode;
 }) {
   const [activePanel, setActivePanel] = useState<ActivePanel | null>(null);
+  const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
   const panelOpenerRef = useRef<HTMLElement | null>(null);
   const heroShellRef = useRef<HTMLDivElement | null>(null);
 
@@ -118,11 +107,19 @@ export function TechHero({
 
       runProgressiveViewTransition(() => {
         options?.beforeUpdate?.();
+        setSelectedPackage(null);
         setActivePanel(panel);
       });
     },
     [],
   );
+
+  const requestPackage = useCallback((packageName: string) => {
+    runProgressiveViewTransition(() => {
+      setSelectedPackage(packageName);
+      setActivePanel("contact");
+    });
+  }, []);
 
   const closePanel = useCallback(() => {
     if (!activePanel) {
@@ -235,7 +232,23 @@ export function TechHero({
             <HeroFooter onOpenPanel={openPanel} />
           </div>
 
-          <ContentPanel activePanel={activePanel} onClose={closePanel} />
+          <a
+            href={WHATSAPP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="floating-whatsapp-button"
+            aria-label="WhatsApp-Chat in neuem Tab öffnen"
+            title="WhatsApp"
+          >
+            <WhatsAppIcon />
+          </a>
+
+          <ContentPanel
+            activePanel={activePanel}
+            selectedPackage={selectedPackage}
+            onClose={closePanel}
+            onRequestPackage={requestPackage}
+          />
         </section>
       </main>
     </>
@@ -249,8 +262,7 @@ function HeroFooter({
 }) {
   return (
     <footer className="hero-legal-footer hero-reveal pb-3 text-center font-mono text-[0.68rem] uppercase tracking-[0.28em] text-white/36">
-      <p>Webdesign für lokale Unternehmen in Deutschland</p>
-      <div className="mt-2 flex items-center justify-center gap-2 text-[0.66rem] tracking-[0.18em] text-white/42">
+      <div className="flex items-center justify-center gap-2 text-[0.66rem] tracking-[0.18em] text-white/42">
         <button
           type="button"
           onClick={() => onOpenPanel("impressum")}
@@ -276,8 +288,11 @@ function HeroFooter({
 function MobileTrustAccent() {
   return (
     <div className="mobile-trust-accent" aria-label="Leistungsversprechen">
-      <p>Webdesign für lokale Unternehmen in Deutschland</p>
-      <span>Responsive · Klar strukturiert · Schnell online</span>
+      <ul className="mobile-trust-list" aria-label="Vorteile">
+        <li>Responsive</li>
+        <li>Klar strukturiert</li>
+        <li>Schnell online</li>
+      </ul>
     </div>
   );
 }
@@ -297,12 +312,12 @@ function Header({
         type="button"
         onClick={onReset}
         aria-label="Zur Startansicht"
-        className="brand-capsule brand-logo-button inline-flex items-center justify-center rounded-full focus:outline-none focus-visible:ring-4 focus-visible:ring-[#d89b3a]/25"
+        className="brand-capsule brand-logo-button inline-flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-[#d89b3a]/25"
       >
         {brandLogo}
       </button>
 
-      <HeroNavigation onOpenPanel={onOpenPanel} />
+      <HeroNavigation brandLogo={brandLogo} onOpenPanel={onOpenPanel} />
     </header>
   );
 }
@@ -389,30 +404,30 @@ function HeroContent({
           <div className="desktop-hero-actions hidden items-center justify-center gap-5 lg:flex">
             <button
               type="button"
-              onClick={() => onOpenPanel("contact")}
-            className="hero-action-button hero-action-primary desktop-primary-cta"
-          >
+              onClick={() => onOpenPanel("offers")}
+              className="hero-action-button"
+            >
               WEBSITE ANFRAGEN
             </button>
             <button
               type="button"
               onClick={() => onOpenPanel("references")}
-            className="hero-action-button desktop-secondary-cta"
-          >
+              className="hero-action-button"
+            >
               REFERENZEN ANSEHEN
             </button>
           </div>
           <button
             type="button"
-            onClick={() => onOpenPanel("contact")}
-            className="hero-action-button hero-action-primary mobile-primary-cta sm:hidden"
+            onClick={() => onOpenPanel("offers")}
+            className="hero-action-button sm:hidden"
           >
             WEBSITE ANFRAGEN
           </button>
           <button
             type="button"
             onClick={() => onOpenPanel("references")}
-            className="hero-action-button mobile-secondary-cta sm:hidden"
+            className="hero-action-button sm:hidden"
           >
             REFERENZEN ANSEHEN
           </button>
@@ -423,8 +438,10 @@ function HeroContent({
 }
 
 function HeroNavigation({
+  brandLogo,
   onOpenPanel,
 }: {
+  brandLogo: ReactNode;
   onOpenPanel: OpenPanel;
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -565,18 +582,12 @@ function HeroNavigation({
           aria-expanded={mobileMenuOpen}
           aria-controls="mobile-hero-menu"
         >
-          Menü
+          <span className="mobile-menu-glyph" aria-hidden="true">
+            <span />
+            <span />
+          </span>
+          <span>MENÜ</span>
         </button>
-        <a
-          href={WHATSAPP_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mobile-whatsapp-button"
-          aria-label="WhatsApp-Chat in neuem Tab öffnen"
-          title="WhatsApp"
-        >
-          <WhatsAppIcon />
-        </a>
       </div>
 
       <dialog
@@ -606,7 +617,7 @@ function HeroNavigation({
       >
         <section className="mobile-menu-stage">
           <header className="mobile-menu-header">
-            <p>DIMICH DIGITAL</p>
+            <div className="mobile-menu-brand-logo">{brandLogo}</div>
             <button
               type="button"
               autoFocus
@@ -635,15 +646,6 @@ function HeroNavigation({
                   className="mobile-menu-primary-item"
                 >
                   <span>{item.label}</span>
-                  <svg
-                    aria-hidden="true"
-                    className="mobile-menu-arrow"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                  >
-                    <path d="M5 12H19" />
-                    <path d="M14 7L19 12L14 17" />
-                  </svg>
                 </button>
               ))}
             </div>
@@ -668,42 +670,16 @@ function HeroNavigation({
       </dialog>
 
       <div className="hidden lg:flex lg:w-auto lg:max-w-none lg:flex-wrap lg:justify-end lg:gap-3">
-        {navItems.map((item) => {
-          const content = (
-            <>
-              <span
-                aria-hidden="true"
-                className={`hero-nav-icon ${item.highlight ? "hero-nav-whatsapp-icon" : ""}`}
-              >
-                {item.highlight ? <WhatsAppIcon /> : item.icon}
-              </span>
-              <span>{item.label}</span>
-            </>
-          );
-          const className = `hero-nav-pill ${item.highlight ? "hero-nav-pill-accent" : ""}`;
-
-          return item.highlight ? (
-            <a
-              key={`${item.label}-${item.panel}`}
-              href={WHATSAPP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="WhatsApp-Chat in neuem Tab öffnen"
-              className={className}
-            >
-              {content}
-            </a>
-          ) : (
-            <button
-              key={`${item.label}-${item.panel}`}
-              type="button"
-              onClick={() => onOpenPanel(item.panel)}
-              className={className}
-            >
-              {content}
-            </button>
-          );
-        })}
+        {navItems.map((item) => (
+          <button
+            key={`${item.label}-${item.panel}`}
+            type="button"
+            onClick={() => onOpenPanel(item.panel)}
+            className="hero-nav-pill"
+          >
+            <span>{item.label}</span>
+          </button>
+        ))}
       </div>
     </nav>
   );

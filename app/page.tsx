@@ -11,15 +11,7 @@ const desktopPosterSrcSet = getImageProps({
 
 export default function Home() {
   const brandLogo = (
-    <Image
-      src="/images/dimich-digital-logo.png"
-      alt="DIMICH DIGITAL"
-      width={1536}
-      height={512}
-      sizes="(max-width: 1023px) 158px, (max-width: 1279px) 190px, 230px"
-      priority
-      className="brand-logo-image"
-    />
+    <span className="brand-wordmark-text">KPTS WERK</span>
   );
   const videoPoster = (
     <picture className="hero-background-poster-picture">
