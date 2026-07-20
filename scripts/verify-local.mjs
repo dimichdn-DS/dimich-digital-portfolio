@@ -1,4 +1,9 @@
-const baseUrl = process.env.VERIFY_LOCAL_URL || "http://localhost:3000";
+const configuredUrl = new URL(
+  process.env.VERIFY_LOCAL_URL || "http://localhost:3000",
+);
+const origin = configuredUrl.origin;
+const rootUrl = `${origin}/`;
+const baseUrl = `${origin}/de`;
 
 async function fetchText(url) {
   const response = await fetch(url);
@@ -35,6 +40,35 @@ function findCssAssets(html) {
 
 function toAbsoluteUrl(asset) {
   return new URL(asset.replace(/&amp;/g, "&"), baseUrl).toString();
+}
+
+const rootResponse = await fetch(rootUrl, { redirect: "manual" });
+const rootLocation = rootResponse.headers.get("location");
+
+if (![307, 308].includes(rootResponse.status)) {
+  fail(`Root route returned HTTP ${rootResponse.status} instead of a redirect`);
+}
+
+if (!rootLocation || new URL(rootLocation, rootUrl).pathname !== "/de") {
+  fail(`Root route does not redirect to /de: ${rootLocation ?? "no location"}`);
+}
+
+const localeChecks = [
+  ["de", "Websites, die"],
+  ["en", "Websites that"],
+  ["ru", "Сайты, которые"],
+];
+
+for (const [locale, expectedCopy] of localeChecks) {
+  const localePage = await fetchText(`${origin}/${locale}`);
+
+  if (!localePage.ok) {
+    fail(`/${locale} returned HTTP ${localePage.status}`);
+  }
+
+  if (!localePage.text.includes(expectedCopy)) {
+    fail(`/${locale} does not contain its localized hero copy`);
+  }
 }
 
 const page = await fetchText(baseUrl);
@@ -79,4 +113,5 @@ if (!hasCustomTheme) {
 
 console.log("HTML OK");
 console.log("CSS OK");
+console.log("Locales OK");
 console.log("Site OK");

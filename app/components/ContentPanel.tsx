@@ -9,221 +9,20 @@ import {
   useRef,
   useState,
 } from "react";
+import { formatMessage } from "../i18n/config";
+import type {
+  LocalizedPortfolioProject,
+  PanelId,
+  SiteDictionary,
+} from "../i18n/types";
 
-export type ActivePanel =
-  | "about"
-  | "services"
-  | "offers"
-  | "references"
-  | "contact"
-  | "impressum"
-  | "privacy";
+export type ActivePanel = PanelId;
 
-const panelMeta: Record<ActivePanel, { label: string; title: string }> = {
-  about: {
-    label: "ÜBER MICH",
-    title: "Digitale Websites mit klarem Blick auf lokale Kunden.",
-  },
-  services: {
-    label: "LEISTUNGEN",
-    title: "Welche Websites ich entwickle",
-  },
-  offers: {
-    label: "ANGEBOTE",
-    title: "Website-Pakete für lokale Unternehmen",
-  },
-  references: {
-    label: "REFERENZEN",
-    title: "Referenzen",
-  },
-  contact: {
-    label: "KONTAKT",
-    title: "Projekt besprechen",
-  },
-  impressum: {
-    label: "IMPRESSUM",
-    title: "Impressum",
-  },
-  privacy: {
-    label: "DATENSCHUTZ",
-    title: "Datenschutzerklärung",
-  },
-};
-
-const services = [
-  {
-    title: "Webdesign",
-    description:
-      "Klar strukturierte Websites für Handwerk, Bau, Küchenstudios, Restaurants, Beauty und lokale Services.",
-  },
-  {
-    title: "Responsive Umsetzung",
-    description:
-      "Layouts, die auf Desktop, iPhone und Android hochwertig wirken und ohne Reibung bedienbar bleiben.",
-  },
-  {
-    title: "Lokale Sichtbarkeit",
-    description:
-      "Klare Nutzerführung, relevante Inhalte und direkte Kontaktwege machen aus Besuchen konkrete Anfragen.",
-  },
-  {
-    title: "AI-ready Lösungen",
-    description:
-      "Upload-Flows, Visualisierungskonzepte und digitale Funktionen, die sinnvoll erweiterbar bleiben.",
-  },
-  {
-    title: "Wartung & Support",
-    description:
-      "Saubere Veröffentlichung und verlässliche technische Begleitung auch nach dem Projektstart.",
-  },
-];
-
-const serviceTypes = [
-  "Handwerker",
-  "Bauunternehmen",
-  "Küchenstudios",
-  "Restaurants & Cafés",
-  "Salons & Beauty",
-  "Autowerkstätten",
-  "Lokale Dienstleistungen",
-  "Individuelle Projekte",
-];
-
-type ServicePackage = {
-  id: string;
-  name: string;
-  subtitle: string;
-  price: string;
-  description: string;
-  deliveryTime: string;
-  revisions: string;
-  features: string[];
-  visibleFeatures: string[];
-  ctaLabel: string;
-  highlighted?: boolean;
-};
-
-const servicePackages: ServicePackage[] = [
-  {
-    id: "start",
-    name: "START",
-    subtitle: "Professioneller Online-Start",
-    price: "ab 990 €",
-    description:
-      "Für Selbstständige, Studios und kleine lokale Unternehmen, die schnell professionell online sichtbar werden möchten.",
-    deliveryTime: "7–10 Werktage",
-    revisions: "1 Korrekturrunde",
-    features: [
-      "Onepage-Website mit bis zu 5 Inhaltsbereichen",
-      "Individuelle Anpassung des Designs",
-      "Responsive für Smartphone, Tablet und Desktop",
-      "Kontaktformular und WhatsApp-Verknüpfung",
-      "Grundlegende SEO-Einstellungen",
-      "Technische Veröffentlichung und Domain-Anbindung",
-      "Performance-Grundoptimierung",
-    ],
-    visibleFeatures: [
-      "Onepage mit bis zu 5 Bereichen",
-      "Individuelle Designanpassung",
-      "Responsive für Smartphone und Desktop",
-      "Kontaktformular oder WhatsApp",
-      "SEO-Basis und Veröffentlichung",
-    ],
-    ctaLabel: "START anfragen",
-  },
-  {
-    id: "business",
-    name: "BUSINESS",
-    subtitle: "Mehr Sichtbarkeit. Mehr Anfragen.",
-    price: "ab 1.890 €",
-    description:
-      "Für Handwerksbetriebe, Gastronomie, Studios, Werkstätten und lokale Dienstleister.",
-    deliveryTime: "2–3 Wochen",
-    revisions: "2 Korrekturrunden",
-    features: [
-      "Bis zu 5 individuelle Seiten",
-      "Individuelles UX/UI-Design",
-      "Leistungen, Referenzen, Über uns und Kontakt",
-      "Kontaktformular, WhatsApp und Google Maps",
-      "Grundlegende Analytics-Integration",
-      "Erweiterte SEO-Struktur",
-      "Performance- und Bildoptimierung",
-      "Conversion-orientierte Nutzerführung",
-    ],
-    visibleFeatures: [
-      "Bis zu 5 individuelle Seiten",
-      "Individuelles UX/UI-Design",
-      "Leistungen, Referenzen und Kontakt",
-      "SEO-Struktur und Performance",
-      "Google Maps, WhatsApp und Formulare",
-    ],
-    ctaLabel: "BUSINESS anfragen",
-    highlighted: true,
-  },
-  {
-    id: "individual",
-    name: "INDIVIDUAL",
-    subtitle: "Digitale Lösungen nach Maß",
-    price: "ab 3.490 €",
-    description:
-      "Für Unternehmen mit individuellen Funktionen, Automatisierung oder komplexeren Integrationen.",
-    deliveryTime: "Projektzeit nach Umfang",
-    revisions: "3 Korrekturrunden",
-    features: [
-      "Individuelle Projektarchitektur",
-      "Mehrseitige Website oder Web-Anwendung",
-      "Mehrsprachige Benutzeroberfläche",
-      "CMS für selbstständige Inhaltsbearbeitung",
-      "Online-Terminbuchung oder Reservierung",
-      "API- und Drittanbieter-Integrationen",
-      "AI-Funktionen nach Projektanforderung",
-      "Erweiterte Performance- und SEO-Optimierung",
-    ],
-    visibleFeatures: [
-      "Individuelle Projektarchitektur",
-      "Website oder Web-Anwendung",
-      "Mehrsprachigkeit und CMS",
-      "Terminbuchung und API-Integrationen",
-      "AI-Funktionen nach Projektbedarf",
-    ],
-    ctaLabel: "Projekt besprechen",
-  },
-];
-
-type PortfolioProject = {
-  id: string;
-  title: string;
-  subtitle: string;
-  category: string;
-  description: string;
-  targetAudience: string;
-  businessGoal: string;
-  image: string;
-  imageAlt: string;
-  imageFit: "cover" | "contain";
-  previewVariant: "landscape" | "portrait";
-  liveUrl: string;
-  technologies: string[];
-  features: string[];
-};
-
-const portfolioProjects: PortfolioProject[] = [
-  {
-    id: "steinoutlet",
-    title: "STEINOutlet",
-    subtitle: "AI Kitchen Visualization Platform",
-    category: "Web Application / Kitchen Industry",
-    description:
-      "Eine digitale Plattform für Küchenarbeitsplatten mit KI-gestützter Visualisierung.",
-    targetAudience:
-      "Küchenstudios, Steinverarbeiter und Kunden, die neue Arbeitsplatten vor dem Kauf visualisieren möchten.",
-    businessGoal:
-      "Material, Dekor und Stärke auswählen und die neue Arbeitsplatte direkt im eigenen Küchenfoto erleben.",
+const portfolioProjectAssets = {
+  steinoutlet: {
     image: "/images/references/steinoutlet-homepage.png",
-    imageAlt:
-      "Startseite von STEINOutlet mit Küchenkonfigurator und Arbeitsplattenvergleich",
-    imageFit: "cover",
-    previewVariant: "landscape",
+    imageFit: "cover" as const,
+    previewVariant: "landscape" as const,
     liveUrl: "https://kitchen-manufaktur.vercel.app",
     technologies: [
       "Next.js",
@@ -233,58 +32,18 @@ const portfolioProjects: PortfolioProject[] = [
       "Cloudflare Workers AI",
       "Vercel",
     ],
-    features: [
-      "Upload-Flow für Küchenfotos",
-      "Material- und Dekorauswahl",
-      "KI-gestützte Bildbearbeitung",
-      "Responsive für Desktop, iPhone und Android",
-      "Mehrsprachige Benutzeroberfläche",
-    ],
   },
-  {
-    id: "aura",
-    title: "AURA",
-    subtitle: "Premium Nail Studio Landing Page",
-    category: "Landing Page / Beauty Studio",
-    description:
-      "Eine dunkel-elegante Landingpage für ein Nagelstudio mit Video-Hero, mehrsprachiger Struktur und klarem Buchungsweg.",
-    targetAudience:
-      "Lokale Beauty- und Nail-Studios, die ihre Atmosphäre hochwertig präsentieren und Termine mobil gewinnen möchten.",
-    businessGoal:
-      "Markenwirkung, Leistungsübersicht und Terminbuchung in einem fokussierten Mobile-first Erlebnis verbinden.",
+  aura: {
     image: "/images/references/aura-homepage.png",
-    imageAlt:
-      "Mobile Startseite des AURA Nail Atelier mit Navigation und Termin-CTA",
-    imageFit: "contain",
-    previewVariant: "portrait",
+    imageFit: "contain" as const,
+    previewVariant: "portrait" as const,
     liveUrl: "https://aura-landing-two-zeta.vercel.app",
     technologies: ["HTML", "CSS", "JavaScript", "Vercel"],
-    features: [
-      "Cinematic Video-Hero",
-      "Mehrsprachige Struktur",
-      "Direkter Buchungsweg",
-      "Mobile-first Umsetzung",
-      "Responsive Design",
-    ],
   },
-];
+};
 
-const contactServices = [
-  "Neue Website",
-  "Website-Redesign",
-  "Landingpage",
-  "Google Maps / lokale Sichtbarkeit",
-  "Wartung oder technische Hilfe",
-  "Noch nicht sicher",
-];
-
-const contactBudgets = [
-  "Noch offen",
-  "Bis 1.000 €",
-  "1.000–2.500 €",
-  "2.500–5.000 €",
-  "Über 5.000 €",
-];
+type PortfolioProject = LocalizedPortfolioProject &
+  (typeof portfolioProjectAssets)[keyof typeof portfolioProjectAssets];
 
 type BriefingField = "name" | "company" | "service" | "description";
 type BriefingErrors = Partial<Record<BriefingField, string>>;
@@ -298,11 +57,13 @@ export function ContentPanel({
   onClose,
   onRequestPackage,
   selectedPackage,
+  dictionary,
 }: {
   activePanel: ActivePanel | null;
   onClose: () => void;
   onRequestPackage: (packageName: string) => void;
   selectedPackage: string | null;
+  dictionary: SiteDictionary["panels"];
 }) {
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const panelRef = useRef<HTMLElement | null>(null);
@@ -384,7 +145,7 @@ export function ContentPanel({
     return null;
   }
 
-  const meta = panelMeta[activePanel];
+  const meta = dictionary.meta[activePanel];
 
   return (
     <div
@@ -395,7 +156,7 @@ export function ContentPanel({
     >
       <button
         type="button"
-        aria-label="Panel über Hintergrund schließen"
+        aria-label={dictionary.common.dismissBackdrop}
         tabIndex={-1}
         className="content-panel-dismiss-layer"
         onClick={onClose}
@@ -431,7 +192,7 @@ export function ContentPanel({
             onClick={onClose}
             autoFocus
             className="content-panel-close"
-            aria-label="Panel schließen"
+            aria-label={dictionary.common.closePanel}
           >
             <svg
               aria-hidden="true"
@@ -449,20 +210,42 @@ export function ContentPanel({
           className="content-panel-scroll"
           role="region"
           tabIndex={0}
-          aria-label={`${meta.label}: Inhalt`}
+          aria-label={formatMessage(dictionary.common.contentRegion, {
+            label: meta.label,
+          })}
         >
           <div className="content-panel-body">
-            {activePanel === "about" && <AboutPanel />}
-            {activePanel === "services" && <ServicesPanel />}
+            {activePanel === "about" && (
+              <AboutPanel content={dictionary.about} />
+            )}
+            {activePanel === "services" && (
+              <ServicesPanel content={dictionary.services} />
+            )}
             {activePanel === "offers" && (
-              <OffersPanel onRequestPackage={onRequestPackage} />
+              <OffersPanel
+                content={dictionary.offers}
+                onRequestPackage={onRequestPackage}
+              />
             )}
-            {activePanel === "references" && <ReferencesPanel />}
+            {activePanel === "references" && (
+              <ReferencesPanel content={dictionary.references} />
+            )}
             {activePanel === "contact" && (
-              <ContactPanel selectedPackage={selectedPackage} />
+              <ContactPanel
+                content={dictionary.contact}
+                selectedPackage={selectedPackage}
+              />
             )}
-            {activePanel === "impressum" && <ImpressumPanel />}
-            {activePanel === "privacy" && <PrivacyPanel />}
+            {activePanel === "impressum" && (
+              <ImpressumPanel
+                authoritativeNotice={dictionary.legal.authoritativeNotice}
+              />
+            )}
+            {activePanel === "privacy" && (
+              <PrivacyPanel
+                authoritativeNotice={dictionary.legal.authoritativeNotice}
+              />
+            )}
           </div>
         </div>
       </section>
@@ -470,55 +253,50 @@ export function ContentPanel({
   );
 }
 
-function AboutPanel() {
+function AboutPanel({
+  content,
+}: {
+  content: SiteDictionary["panels"]["about"];
+}) {
   return (
     <div className="panel-editorial panel-about">
       <p className="panel-lead">
-        Ich entwickle moderne Websites für kleine Unternehmen in Deutschland:
-        klar strukturiert, mobil optimiert und auf echte Anfragen ausgerichtet.
+        {content.lead}
       </p>
 
       <p className="panel-copy">
-        Ich verbinde Design, technische Umsetzung und ein praktisches
-        Verständnis dafür, was lokale Unternehmen wirklich brauchen: einen
-        professionellen Online-Auftritt, der Vertrauen schafft und Kunden den
-        nächsten Schritt leicht macht.
+        {content.copy}
       </p>
 
       <p className="panel-accent-copy">
-        Mein Fokus liegt auf klarer Kommunikation, sauberer Umsetzung und
-        digitalen Lösungen, die nicht nur gut aussehen, sondern im Alltag
-        funktionieren.
+        {content.accent}
       </p>
 
-      <dl className="panel-facts" aria-label="Arbeitsfelder">
-        <div>
-          <dt>Design</dt>
-          <dd>Ruhige visuelle Systeme, die Vertrauen schaffen.</dd>
-        </div>
-        <div>
-          <dt>Development</dt>
-          <dd>Saubere Umsetzung mit Fokus auf Geschwindigkeit.</dd>
-        </div>
-        <div>
-          <dt>AI-ready</dt>
-          <dd>Moderne Funktionen, wenn sie dem Projekt wirklich helfen.</dd>
-        </div>
+      <dl className="panel-facts" aria-label={content.factsLabel}>
+        {content.facts.map((fact) => (
+          <div key={fact.term}>
+            <dt>{fact.term}</dt>
+            <dd>{fact.description}</dd>
+          </div>
+        ))}
       </dl>
     </div>
   );
 }
 
-function ServicesPanel() {
+function ServicesPanel({
+  content,
+}: {
+  content: SiteDictionary["panels"]["services"];
+}) {
   return (
     <div className="panel-editorial">
       <p className="panel-intro">
-        Moderne Websites für lokale Unternehmen, die professionell auftreten
-        und online mehr Anfragen gewinnen möchten.
+        {content.intro}
       </p>
 
       <div className="panel-service-list">
-        {services.map((service) => (
+        {content.items.map((service) => (
           <article key={service.title} className="panel-service-row">
             <h3>{service.title}</h3>
             <p>{service.description}</p>
@@ -527,16 +305,19 @@ function ServicesPanel() {
         ))}
       </div>
 
-      <p className="panel-sector-line">{serviceTypes.join(" · ")}</p>
+      <p className="panel-sector-line">{content.sectors.join(" · ")}</p>
     </div>
   );
 }
 
 function OffersPanel({
+  content,
   onRequestPackage,
 }: {
+  content: SiteDictionary["panels"]["offers"];
   onRequestPackage: (packageName: string) => void;
 }) {
+  const servicePackages = content.packages;
   const gestureStartRef = useRef<{ x: number; y: number } | null>(null);
   const [activePackageIndex, setActivePackageIndex] = useState(0);
 
@@ -607,13 +388,13 @@ function OffersPanel({
 
         <div
           className="portfolio-carousel-arrows service-package-carousel-arrows"
-          aria-label="Paket wechseln"
+          aria-label={content.changePackage}
         >
           <button
             type="button"
             onClick={() => showPackage(activePackageIndex - 1)}
             disabled={activePackageIndex === 0}
-            aria-label="Vorheriges Paket"
+            aria-label={content.previousPackage}
           >
             <CarouselArrow direction="previous" />
           </button>
@@ -621,7 +402,7 @@ function OffersPanel({
             type="button"
             onClick={() => showPackage(activePackageIndex + 1)}
             disabled={activePackageIndex === servicePackages.length - 1}
-            aria-label="Nächstes Paket"
+            aria-label={content.nextPackage}
           >
             <CarouselArrow direction="next" />
           </button>
@@ -631,8 +412,8 @@ function OffersPanel({
       <div
         className="service-package-carousel"
         role="region"
-        aria-roledescription="Karussell"
-        aria-label="Website-Pakete"
+        aria-roledescription={content.carouselDescription}
+        aria-label={content.carouselLabel}
         tabIndex={0}
         onKeyDown={handlePackageKeyDown}
         onPointerDown={handlePackagePointerDown}
@@ -659,8 +440,12 @@ function OffersPanel({
                     servicePackage.highlighted ? " is-highlighted" : ""
                   }`}
                   role="group"
-                  aria-roledescription="Slide"
-                  aria-label={`${index + 1} von ${servicePackages.length}: ${servicePackage.name}`}
+                  aria-roledescription={content.slideDescription}
+                  aria-label={formatMessage(content.slideLabel, {
+                    current: index + 1,
+                    total: servicePackages.length,
+                    name: servicePackage.name,
+                  })}
                 >
                   <header className="service-package-header">
                     <div>
@@ -676,7 +461,7 @@ function OffersPanel({
                     </div>
                     {servicePackage.highlighted && (
                       <span className="service-package-recommendation">
-                        EMPFOHLEN
+                        {content.recommended}
                       </span>
                     )}
                   </header>
@@ -687,7 +472,9 @@ function OffersPanel({
 
                   <ul
                     className="service-package-feature-list"
-                    aria-label={`${servicePackage.name}: enthaltene Leistungen`}
+                    aria-label={formatMessage(content.includedServices, {
+                      name: servicePackage.name,
+                    })}
                   >
                     {servicePackage.visibleFeatures.map((feature) => (
                       <li key={feature}>{feature}</li>
@@ -718,7 +505,7 @@ function OffersPanel({
 
       <div
         className="portfolio-carousel-pagination service-package-pagination"
-        aria-label="Paket auswählen"
+        aria-label={content.selectPackage}
       >
         {servicePackages.map((servicePackage, index) => (
           <button
@@ -726,16 +513,16 @@ function OffersPanel({
             type="button"
             className={index === activePackageIndex ? "is-active" : undefined}
             onClick={() => showPackage(index)}
-            aria-label={`${servicePackage.name} anzeigen`}
+            aria-label={formatMessage(content.showPackage, {
+              name: servicePackage.name,
+            })}
             aria-current={index === activePackageIndex ? "true" : undefined}
           />
         ))}
       </div>
 
       <p className="service-package-note">
-        Alle Preise gelten als Ausgangspreise. Der endgültige Preis hängt vom
-        Umfang und den gewünschten Funktionen ab. Domain, Hosting,
-        kostenpflichtige Lizenzen und Rechtstexte werden separat vereinbart.
+        {content.note}
       </p>
     </div>
   );
@@ -765,7 +552,17 @@ function positionReferenceTrack(
   track.style.transform = `translate3d(${-(projectElement.offsetLeft) + dragOffset}px, 0, 0)`;
 }
 
-function ReferencesPanel() {
+function ReferencesPanel({
+  content,
+}: {
+  content: SiteDictionary["panels"]["references"];
+}) {
+  const portfolioProjects: PortfolioProject[] = content.projects.map(
+    (project) => ({
+      ...project,
+      ...portfolioProjectAssets[project.id],
+    }),
+  );
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
   const gestureRef = useRef<ReferenceGesture | null>(null);
@@ -995,12 +792,15 @@ function ReferencesPanel() {
           {String(portfolioProjects.length).padStart(2, "0")}
         </p>
 
-        <div className="portfolio-carousel-arrows" aria-label="Projekt wechseln">
+        <div
+          className="portfolio-carousel-arrows"
+          aria-label={content.changeProject}
+        >
           <button
             type="button"
             onClick={() => showProject(activeProjectIndex - 1)}
             disabled={activeProjectIndex === 0}
-            aria-label="Vorheriges Projekt"
+            aria-label={content.previousProject}
           >
             <CarouselArrow direction="previous" />
           </button>
@@ -1008,7 +808,7 @@ function ReferencesPanel() {
             type="button"
             onClick={() => showProject(activeProjectIndex + 1)}
             disabled={activeProjectIndex === portfolioProjects.length - 1}
-            aria-label="Nächstes Projekt"
+            aria-label={content.nextProject}
           >
             <CarouselArrow direction="next" />
           </button>
@@ -1019,8 +819,8 @@ function ReferencesPanel() {
         ref={viewportRef}
         className="portfolio-carousel-track"
         role="region"
-        aria-roledescription="Karussell"
-        aria-label="Portfolio-Projekte"
+        aria-roledescription={content.carouselDescription}
+        aria-label={content.carouselLabel}
         tabIndex={0}
         onKeyDown={handleCarouselKeyDown}
         onPointerDown={handleProjectPointerDown}
@@ -1040,13 +840,15 @@ function ReferencesPanel() {
               isActive={index === activeProjectIndex}
               isAdjacent={Math.abs(index - activeProjectIndex) === 1}
               onShowProject={showProject}
+              content={content}
+              projects={portfolioProjects}
             />
           ))}
         </div>
       </div>
 
       <p className="portfolio-carousel-hint" aria-hidden="true">
-        Horizontal wischen oder Pfeiltasten verwenden
+        {content.swipeHint}
       </p>
     </div>
   );
@@ -1059,6 +861,8 @@ function CaseStudy({
   isActive,
   isAdjacent,
   onShowProject,
+  content,
+  projects,
 }: {
   project: PortfolioProject;
   index: number;
@@ -1066,13 +870,19 @@ function CaseStudy({
   isActive: boolean;
   isAdjacent: boolean;
   onShowProject: (index: number) => void;
+  content: SiteDictionary["panels"]["references"];
+  projects: PortfolioProject[];
 }) {
   return (
     <article
       className="portfolio-project"
       role="group"
-      aria-roledescription="Slide"
-      aria-label={`${index + 1} von ${total}: ${project.title}`}
+      aria-roledescription={content.slideDescription}
+      aria-label={formatMessage(content.slideLabel, {
+        current: index + 1,
+        total,
+        name: project.title,
+      })}
       aria-hidden={!isActive}
     >
       <div
@@ -1115,7 +925,7 @@ function CaseStudy({
 
       <div className="portfolio-project-content">
         <div className="portfolio-project-identity">
-          <p>Case Study · {project.category}</p>
+          <p>{content.caseStudy} · {project.category}</p>
           <h3>{project.title}</h3>
           <h4>{project.subtitle}</h4>
         </div>
@@ -1124,18 +934,18 @@ function CaseStudy({
 
         <dl className="portfolio-project-brief">
           <div>
-            <dt>Für wen</dt>
+            <dt>{content.targetAudience}</dt>
             <dd>{project.targetAudience}</dd>
           </div>
           <div>
-            <dt>Business-Ziel</dt>
+            <dt>{content.businessGoal}</dt>
             <dd>{project.businessGoal}</dd>
           </div>
         </dl>
 
         <div id={`${project.id}-details`} className="portfolio-project-details">
           <section aria-labelledby={`${project.id}-technologies`}>
-            <h5 id={`${project.id}-technologies`}>Technologien</h5>
+            <h5 id={`${project.id}-technologies`}>{content.technologies}</h5>
             <ul className="portfolio-technology-list">
               {project.technologies.map((technology) => (
                 <li key={technology}>{technology}</li>
@@ -1144,7 +954,7 @@ function CaseStudy({
           </section>
 
           <section aria-labelledby={`${project.id}-features`}>
-            <h5 id={`${project.id}-features`}>Funktionen & Vorteile</h5>
+            <h5 id={`${project.id}-features`}>{content.features}</h5>
             <ul className="portfolio-feature-list">
               {project.features.map((feature) => (
                 <li key={feature}>{feature}</li>
@@ -1158,24 +968,28 @@ function CaseStudy({
             href={project.liveUrl}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={`${project.title} Live-Website in neuem Tab ansehen`}
+            aria-label={formatMessage(content.liveWebsiteAria, {
+              project: project.title,
+            })}
             className="portfolio-action"
             tabIndex={isActive ? 0 : -1}
           >
-            Live-Website ansehen
+            {content.liveWebsite}
           </a>
           <a
             href={`#${project.id}-details`}
             className="portfolio-action"
             tabIndex={isActive ? 0 : -1}
           >
-            Details ansehen
+            {content.details}
           </a>
         </div>
 
         <nav
           className="portfolio-project-navigation"
-          aria-label={`${project.title}: Projektnavigation`}
+          aria-label={formatMessage(content.projectNavigation, {
+            project: project.title,
+          })}
           onPointerDown={(event) => event.stopPropagation()}
         >
           <div className="portfolio-project-navigation-row">
@@ -1185,7 +999,7 @@ function CaseStudy({
               onClick={() => onShowProject(index - 1)}
               disabled={index === 0}
               tabIndex={isActive ? 0 : -1}
-              aria-label="Vorheriges Projekt"
+              aria-label={content.previousProject}
             >
               <CarouselArrow direction="previous" />
             </button>
@@ -1201,7 +1015,7 @@ function CaseStudy({
               onClick={() => onShowProject(index + 1)}
               disabled={index === total - 1}
               tabIndex={isActive ? 0 : -1}
-              aria-label="Nächstes Projekt"
+              aria-label={content.nextProject}
             >
               <CarouselArrow direction="next" />
             </button>
@@ -1209,16 +1023,18 @@ function CaseStudy({
 
           <div
             className="portfolio-carousel-pagination portfolio-project-navigation-dots"
-            aria-label="Projekt auswählen"
+            aria-label={content.selectProject}
           >
-            {portfolioProjects.map((portfolioProject, projectIndex) => (
+            {projects.map((portfolioProject, projectIndex) => (
               <button
                 key={portfolioProject.id}
                 type="button"
                 className={projectIndex === index ? "is-active" : undefined}
                 onClick={() => onShowProject(projectIndex)}
                 tabIndex={isActive ? 0 : -1}
-                aria-label={`${portfolioProject.title} anzeigen`}
+                aria-label={formatMessage(content.showProject, {
+                  project: portfolioProject.title,
+                })}
                 aria-current={projectIndex === index ? "true" : undefined}
               />
             ))}
@@ -1241,7 +1057,13 @@ function CarouselArrow({ direction }: { direction: "previous" | "next" }) {
   );
 }
 
-function ContactPanel({ selectedPackage }: { selectedPackage: string | null }) {
+function ContactPanel({
+  selectedPackage,
+  content,
+}: {
+  selectedPackage: string | null;
+  content: SiteDictionary["panels"]["contact"];
+}) {
   const formRef = useRef<HTMLFormElement | null>(null);
   const nameRef = useRef<HTMLInputElement | null>(null);
   const companyRef = useRef<HTMLInputElement | null>(null);
@@ -1249,7 +1071,7 @@ function ContactPanel({ selectedPackage }: { selectedPackage: string | null }) {
   const descriptionRef = useRef<HTMLTextAreaElement | null>(null);
   const [errors, setErrors] = useState<BriefingErrors>({});
   const selectedService = selectedPackage
-    ? `Website-Paket: ${selectedPackage}`
+    ? `${content.selectedPackageOption}: ${selectedPackage}`
     : "";
 
   function clearError(field: BriefingField) {
@@ -1276,26 +1098,25 @@ function ContactPanel({ selectedPackage }: { selectedPackage: string | null }) {
       name: String(formData.get("name") ?? "").trim(),
       company: String(formData.get("company") ?? "").trim(),
       service: String(formData.get("service") ?? "").trim(),
-      budget: String(formData.get("budget") ?? "Noch offen").trim(),
+      budget: String(formData.get("budget") ?? content.openBudget).trim(),
       description: String(formData.get("description") ?? "").trim(),
     };
     const nextErrors: BriefingErrors = {};
 
     if (!values.name) {
-      nextErrors.name = "Bitte geben Sie Ihren Namen ein.";
+      nextErrors.name = content.fields.name.error;
     }
 
     if (!values.company) {
-      nextErrors.company =
-        "Bitte geben Sie Ihr Unternehmen oder Ihre Branche ein.";
+      nextErrors.company = content.fields.company.error;
     }
 
     if (!values.service) {
-      nextErrors.service = "Bitte wählen Sie eine Leistung aus.";
+      nextErrors.service = content.fields.service.error;
     }
 
     if (!values.description) {
-      nextErrors.description = "Bitte beschreiben Sie kurz Ihr Projekt.";
+      nextErrors.description = content.fields.description.error;
     }
 
     setErrors(nextErrors);
@@ -1319,18 +1140,18 @@ function ContactPanel({ selectedPackage }: { selectedPackage: string | null }) {
     }
 
     const message = [
-      "Hallo, ich interessiere mich für eine Website.",
+      content.message.greeting,
       "",
-      `Name: ${values.name}`,
-      `Unternehmen / Branche: ${values.company}`,
-      `Benötigt: ${values.service}`,
-      `Budget: ${values.budget || "Noch offen"}`,
+      `${content.message.name}: ${values.name}`,
+      `${content.message.company}: ${values.company}`,
+      `${content.message.needed}: ${values.service}`,
+      `${content.message.budget}: ${values.budget || content.openBudget}`,
       "",
-      "Projektbeschreibung:",
+      `${content.message.description}:`,
       values.description,
       "",
-      "Quelle:",
-      "KPTS WERK Website",
+      `${content.message.source}:`,
+      content.message.sourceValue,
     ].join("\n");
     return message;
   }
@@ -1352,7 +1173,7 @@ function ContactPanel({ selectedPackage }: { selectedPackage: string | null }) {
       return;
     }
 
-    const subject = "Projektanfrage über KPTS WERK";
+    const subject = content.message.emailSubject;
     window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
       subject,
     )}&body=${encodeURIComponent(message)}`;
@@ -1361,18 +1182,15 @@ function ContactPanel({ selectedPackage }: { selectedPackage: string | null }) {
   return (
     <div className="panel-editorial panel-contact">
       <p className="panel-lead">
-        Sie möchten eine moderne Website für Ihr Unternehmen? Schreiben Sie mir
-        kurz, worum es geht — ich melde mich mit einem klaren nächsten Schritt.
+        {content.lead}
       </p>
       <p className="panel-copy">
-        Ob Handwerksbetrieb, Küchenstudio, Restaurant, Salon oder lokaler
-        Service: Ich helfe dabei, einen professionellen digitalen Auftritt
-        aufzubauen.
+        {content.copy}
       </p>
 
       {selectedPackage && (
         <p className="panel-selected-package">
-          Ausgewähltes Paket <strong>{selectedPackage}</strong>
+          {content.selectedPackage} <strong>{selectedPackage}</strong>
         </p>
       )}
 
@@ -1384,7 +1202,7 @@ function ContactPanel({ selectedPackage }: { selectedPackage: string | null }) {
       >
         <div className="panel-briefing-grid">
           <div className="panel-briefing-field">
-            <label htmlFor="briefing-name">Ihr Name</label>
+            <label htmlFor="briefing-name">{content.fields.name.label}</label>
             <input
               ref={nameRef}
               id="briefing-name"
@@ -1392,7 +1210,7 @@ function ContactPanel({ selectedPackage }: { selectedPackage: string | null }) {
               type="text"
               required
               autoComplete="name"
-              placeholder="Vor- und Nachname"
+              placeholder={content.fields.name.placeholder}
               aria-invalid={errors.name ? "true" : undefined}
               aria-describedby={
                 errors.name ? "briefing-name-error" : undefined
@@ -1411,7 +1229,9 @@ function ContactPanel({ selectedPackage }: { selectedPackage: string | null }) {
           </div>
 
           <div className="panel-briefing-field">
-            <label htmlFor="briefing-company">Unternehmen oder Branche</label>
+            <label htmlFor="briefing-company">
+              {content.fields.company.label}
+            </label>
             <input
               ref={companyRef}
               id="briefing-company"
@@ -1419,7 +1239,7 @@ function ContactPanel({ selectedPackage }: { selectedPackage: string | null }) {
               type="text"
               required
               autoComplete="organization"
-              placeholder="Zum Beispiel Handwerksbetrieb, Salon, Restaurant"
+              placeholder={content.fields.company.placeholder}
               aria-invalid={errors.company ? "true" : undefined}
               aria-describedby={
                 errors.company ? "briefing-company-error" : undefined
@@ -1438,7 +1258,9 @@ function ContactPanel({ selectedPackage }: { selectedPackage: string | null }) {
           </div>
 
           <div className="panel-briefing-field">
-            <label htmlFor="briefing-service">Was wird benötigt?</label>
+            <label htmlFor="briefing-service">
+              {content.fields.service.label}
+            </label>
             <select
               ref={serviceRef}
               id="briefing-service"
@@ -1452,12 +1274,12 @@ function ContactPanel({ selectedPackage }: { selectedPackage: string | null }) {
               onChange={() => clearError("service")}
             >
               <option value="" disabled>
-                Bitte auswählen
+                {content.fields.service.placeholder}
               </option>
               {selectedPackage && (
                 <option value={selectedService}>{selectedService}</option>
               )}
-              {contactServices.map((service) => (
+              {content.services.map((service) => (
                 <option key={service} value={service}>
                   {service}
                 </option>
@@ -1475,13 +1297,15 @@ function ContactPanel({ selectedPackage }: { selectedPackage: string | null }) {
           </div>
 
           <div className="panel-briefing-field">
-            <label htmlFor="briefing-budget">Geplanter Budget-Rahmen</label>
+            <label htmlFor="briefing-budget">
+              {content.fields.budget.label}
+            </label>
             <select
               id="briefing-budget"
               name="budget"
-              defaultValue="Noch offen"
+              defaultValue={content.openBudget}
             >
-              {contactBudgets.map((budget) => (
+              {content.budgets.map((budget) => (
                 <option key={budget} value={budget}>
                   {budget}
                 </option>
@@ -1491,7 +1315,7 @@ function ContactPanel({ selectedPackage }: { selectedPackage: string | null }) {
 
           <div className="panel-briefing-field panel-briefing-field-wide">
             <label htmlFor="briefing-description">
-              Worum geht es bei Ihrem Projekt?
+              {content.fields.description.label}
             </label>
             <textarea
               ref={descriptionRef}
@@ -1500,7 +1324,7 @@ function ContactPanel({ selectedPackage }: { selectedPackage: string | null }) {
               required
               rows={5}
               maxLength={1200}
-              placeholder="Beschreiben Sie kurz Ihr Unternehmen, Ihr Ziel und was die neue Website erreichen soll."
+              placeholder={content.fields.description.placeholder}
               aria-invalid={errors.description ? "true" : undefined}
               aria-describedby={
                 errors.description
@@ -1527,7 +1351,7 @@ function ContactPanel({ selectedPackage }: { selectedPackage: string | null }) {
             className="panel-briefing-submit panel-briefing-submit-primary"
             onClick={() => sendBriefing("whatsapp")}
           >
-            Per WhatsApp senden
+            {content.sendWhatsapp}
             <span aria-hidden="true">→</span>
           </button>
           <button
@@ -1535,42 +1359,41 @@ function ContactPanel({ selectedPackage }: { selectedPackage: string | null }) {
             className="panel-briefing-submit"
             onClick={() => sendBriefing("email")}
           >
-            Per E-Mail senden
+            {content.sendEmail}
             <span aria-hidden="true">→</span>
           </button>
         </div>
 
         <p className="panel-briefing-privacy">
-          Mit dem Absenden wird nur eine Nachricht in WhatsApp oder im
-          E-Mail-Programm vorbereitet. Es werden keine Daten auf dieser Website
-          gespeichert.
+          {content.privacy}
         </p>
       </form>
 
       <div className="panel-contact-note">
-        <p>Antwort innerhalb von 24h</p>
+        <p>{content.responseTime}</p>
         <dl>
-          <div>
-            <dt>Start</dt>
-            <dd>Kurzes Erstgespräch</dd>
-          </div>
-          <div>
-            <dt>Fokus</dt>
-            <dd>Klare Website, mehr Vertrauen, mehr Anfragen</dd>
-          </div>
-          <div>
-            <dt>Umsetzung</dt>
-            <dd>Design, Entwicklung, Veröffentlichung</dd>
-          </div>
+          {content.facts.map((fact) => (
+            <div key={fact.term}>
+              <dt>{fact.term}</dt>
+              <dd>{fact.description}</dd>
+            </div>
+          ))}
         </dl>
       </div>
     </div>
   );
 }
 
-function ImpressumPanel() {
+function ImpressumPanel({
+  authoritativeNotice,
+}: {
+  authoritativeNotice: string | null;
+}) {
   return (
     <div className="panel-editorial panel-legal">
+      {authoritativeNotice && (
+        <p className="panel-legal-notice">{authoritativeNotice}</p>
+      )}
       <section>
         <h3>Angaben gemäß § 5 TMG</h3>
         <div className="panel-legal-address">
@@ -1598,7 +1421,11 @@ function ImpressumPanel() {
   );
 }
 
-function PrivacyPanel() {
+function PrivacyPanel({
+  authoritativeNotice,
+}: {
+  authoritativeNotice: string | null;
+}) {
   const privacySections = [
     {
       title: "1. Allgemeine Hinweise",
@@ -1620,6 +1447,9 @@ function PrivacyPanel() {
 
   return (
     <div className="panel-editorial panel-legal panel-privacy">
+      {authoritativeNotice && (
+        <p className="panel-legal-notice">{authoritativeNotice}</p>
+      )}
       <p className="panel-lead">
         Diese Datenschutzerklärung ist ein Platzhalter.
       </p>

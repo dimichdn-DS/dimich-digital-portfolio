@@ -1,5 +1,8 @@
 import Image, { getImageProps } from "next/image";
-import { TechHero } from "./components/TechHero";
+import { notFound } from "next/navigation";
+import { TechHero } from "../components/TechHero";
+import { isLocale } from "../i18n/config";
+import { getDictionary } from "../i18n/get-dictionary";
 
 const desktopPosterSrcSet = getImageProps({
   src: "/images/hero/dimich-hero-desktop-workspace-v1.png",
@@ -22,7 +25,16 @@ function BrandWordmark() {
   );
 }
 
-export default function Home() {
+export default async function LocalePage({
+  params,
+}: {
+  params: { locale: string };
+}) {
+  if (!isLocale(params.locale)) {
+    notFound();
+  }
+
+  const dictionary = await getDictionary(params.locale);
   const brandLogo = <BrandWordmark />;
   const videoPoster = (
     <picture className="hero-background-poster-picture">
@@ -43,5 +55,12 @@ export default function Home() {
     </picture>
   );
 
-  return <TechHero brandLogo={brandLogo} videoPoster={videoPoster} />;
+  return (
+    <TechHero
+      locale={params.locale}
+      dictionary={dictionary}
+      brandLogo={brandLogo}
+      videoPoster={videoPoster}
+    />
+  );
 }

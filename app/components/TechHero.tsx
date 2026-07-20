@@ -5,10 +5,19 @@ import {
   useEffect,
   useRef,
   useState,
+  type KeyboardEvent as ReactKeyboardEvent,
   type ReactNode,
 } from "react";
 import { flushSync } from "react-dom";
 import { ContentPanel, type ActivePanel } from "./ContentPanel";
+import {
+  formatMessage,
+  localeCookieName,
+  localeLabels,
+  locales,
+  type Locale,
+} from "../i18n/config";
+import type { HeadlineLine, SiteDictionary } from "../i18n/types";
 
 const WHATSAPP_URL = "https://wa.me/49784442215";
 
@@ -53,42 +62,16 @@ function runProgressiveViewTransition(update: () => void) {
   }
 }
 
-const heroCopy = {
-  subtitle:
-    "Moderne Websites für lokale Unternehmen, die professionell auftreten und mehr Anfragen gewinnen möchten.",
-  description:
-    "Ich entwickle schnelle, hochwertige und mobil optimierte Websites, die professionell wirken und aus Besuchern echte Anfragen machen.",
-};
-
-const navItems: Array<{
-  label: string;
-  panel: ActivePanel;
-}> = [
-  {
-    label: "Über mich",
-    panel: "about",
-  },
-  {
-    label: "Leistungen",
-    panel: "services",
-  },
-  {
-    label: "Referenzen",
-    panel: "references",
-  },
-  {
-    label: "Kontakt",
-    panel: "contact",
-  },
-];
-
-const standardNavItems = navItems;
 const particleIndexes = Array.from({ length: 12 }, (_, index) => index);
 
 export function TechHero({
+  locale,
+  dictionary,
   brandLogo,
   videoPoster,
 }: {
+  locale: Locale;
+  dictionary: SiteDictionary;
   brandLogo: ReactNode;
   videoPoster: ReactNode;
 }) {
@@ -197,7 +180,7 @@ export function TechHero({
   return (
     <>
       <a className="skip-link" href="#main-content">
-        Zum Hauptinhalt springen
+        {dictionary.hero.skipLink}
       </a>
       <main
         id="main-content"
@@ -222,16 +205,18 @@ export function TechHero({
             }`}
           >
             <Header
+              locale={locale}
+              copy={dictionary.hero}
               brandLogo={brandLogo}
               onReset={closePanel}
               onOpenPanel={openPanel}
             />
 
             <div className="hero-main-slot relative flex flex-1 flex-col justify-center py-3 sm:py-10 lg:py-8">
-              <HeroContent onOpenPanel={openPanel} />
+              <HeroContent copy={dictionary.hero} onOpenPanel={openPanel} />
             </div>
 
-            <HeroFooter onOpenPanel={openPanel} />
+            <HeroFooter copy={dictionary.hero} onOpenPanel={openPanel} />
           </div>
 
           <a
@@ -239,7 +224,7 @@ export function TechHero({
             target="_blank"
             rel="noopener noreferrer"
             className="floating-whatsapp-button"
-            aria-label="WhatsApp-Chat in neuem Tab öffnen"
+            aria-label={dictionary.hero.whatsappLabel}
             title="WhatsApp"
           >
             <WhatsAppIcon />
@@ -250,6 +235,7 @@ export function TechHero({
             selectedPackage={selectedPackage}
             onClose={closePanel}
             onRequestPackage={requestPackage}
+            dictionary={dictionary.panels}
           />
         </section>
       </main>
@@ -258,8 +244,10 @@ export function TechHero({
 }
 
 function HeroFooter({
+  copy,
   onOpenPanel,
 }: {
+  copy: SiteDictionary["hero"];
   onOpenPanel: OpenPanel;
 }) {
   return (
@@ -270,7 +258,7 @@ function HeroFooter({
           onClick={() => onOpenPanel("impressum")}
           className="transition hover:text-[#d89b3a] focus:outline-none focus-visible:rounded-md focus-visible:ring-4 focus-visible:ring-[#d89b3a]/25"
         >
-          Impressum
+          {copy.legal.impressum}
         </button>
         <span aria-hidden="true" className="text-[#d89b3a]/55">
           ·
@@ -280,7 +268,7 @@ function HeroFooter({
           onClick={() => onOpenPanel("privacy")}
           className="transition hover:text-[#d89b3a] focus:outline-none focus-visible:rounded-md focus-visible:ring-4 focus-visible:ring-[#d89b3a]/25"
         >
-          Datenschutz
+          {copy.legal.privacy}
         </button>
       </div>
     </footer>
@@ -288,10 +276,14 @@ function HeroFooter({
 }
 
 function Header({
+  locale,
+  copy,
   brandLogo,
   onReset,
   onOpenPanel,
 }: {
+  locale: Locale;
+  copy: SiteDictionary["hero"];
   brandLogo: ReactNode;
   onReset: () => void;
   onOpenPanel: OpenPanel;
@@ -301,13 +293,18 @@ function Header({
       <button
         type="button"
         onClick={onReset}
-        aria-label="Zur Startansicht"
+        aria-label={copy.homeLabel}
         className="brand-capsule brand-logo-button inline-flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-[#d89b3a]/25"
       >
         {brandLogo}
       </button>
 
-      <HeroNavigation brandLogo={brandLogo} onOpenPanel={onOpenPanel} />
+      <HeroNavigation
+        locale={locale}
+        copy={copy}
+        brandLogo={brandLogo}
+        onOpenPanel={onOpenPanel}
+      />
     </header>
   );
 }
@@ -320,7 +317,33 @@ function HeroBackgroundVideo({
   isPaused: boolean;
 }) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const isPausedRef = useRef(isPaused);
   const [videoReady, setVideoReady] = useState(false);
+
+  isPausedRef.current = isPaused;
+
+  const requestPlayback = useCallback(() => {
+    const video = videoRef.current;
+
+    if (
+      !video ||
+      isPausedRef.current ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return;
+    }
+
+    const playPromise = video.play();
+
+    if (playPromise) {
+      void playPromise.then(
+        () => setVideoReady(true),
+        () => setVideoReady(false),
+      );
+    } else {
+      setVideoReady(!video.paused);
+    }
+  }, []);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -334,14 +357,47 @@ function HeroBackgroundVideo({
       return;
     }
 
-    const playPromise = video.play();
+    requestPlayback();
+  }, [isPaused, requestPlayback]);
 
-    if (playPromise) {
-      void playPromise.catch(() => {
-        // The poster remains available when autoplay is blocked.
-      });
+  useEffect(() => {
+    function resumeVisibleVideo() {
+      if (!document.hidden) {
+        requestPlayback();
+      }
     }
-  }, [isPaused]);
+
+    window.addEventListener("pageshow", resumeVisibleVideo);
+    document.addEventListener("visibilitychange", resumeVisibleVideo);
+
+    return () => {
+      window.removeEventListener("pageshow", resumeVisibleVideo);
+      document.removeEventListener("visibilitychange", resumeVisibleVideo);
+    };
+  }, [requestPlayback]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    const viewportQuery = window.matchMedia("(min-width: 768px)");
+    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    if (!video) {
+      return;
+    }
+
+    function refreshResponsiveSource() {
+      setVideoReady(false);
+      video?.load();
+    }
+
+    viewportQuery.addEventListener("change", refreshResponsiveSource);
+    motionQuery.addEventListener("change", refreshResponsiveSource);
+
+    return () => {
+      viewportQuery.removeEventListener("change", refreshResponsiveSource);
+      motionQuery.removeEventListener("change", refreshResponsiveSource);
+    };
+  }, []);
 
   return (
     <div
@@ -362,8 +418,12 @@ function HeroBackgroundVideo({
         loop
         playsInline
         preload="metadata"
+        controls={false}
+        disablePictureInPicture
         onLoadStart={() => setVideoReady(false)}
-        onCanPlay={() => setVideoReady(true)}
+        onLoadedMetadata={requestPlayback}
+        onCanPlay={requestPlayback}
+        onPlaying={() => setVideoReady(true)}
         className="hero-background-video h-full w-full object-cover"
       >
         <source
@@ -382,8 +442,10 @@ function HeroBackgroundVideo({
 }
 
 function HeroContent({
+  copy,
   onOpenPanel,
 }: {
+  copy: SiteDictionary["hero"];
   onOpenPanel: OpenPanel;
 }) {
   return (
@@ -395,21 +457,22 @@ function HeroContent({
 
       <div className="hero-core-copy relative z-10 mx-auto max-w-[900px] rounded-[2rem]">
         <h1 className="hero-title mx-auto max-w-[900px] text-[clamp(2.28rem,6.7vw,5.25rem)] font-bold leading-[0.99] tracking-[-0.035em] text-slate-50 drop-shadow-[0_8px_28px_rgba(0,0,0,0.55)]">
-          <span className="hidden sm:block">Websites, die lokale</span>
-          <span className="hidden sm:block">
-            Kunden <span className="hero-title-gold">überzeugen.</span>
-          </span>
-          <span className="block sm:hidden">Websites, die</span>
-          <span className="block sm:hidden">lokale Kunden</span>
-          <span className="hero-title-gold block sm:hidden">überzeugen.</span>
+          <LocalizedHeadlineLines
+            lines={copy.headlineDesktop}
+            className="hidden sm:block"
+          />
+          <LocalizedHeadlineLines
+            lines={copy.headlineMobile}
+            className="block sm:hidden"
+          />
         </h1>
 
         <p className="hero-subtitle mx-auto mt-6 max-w-3xl text-base font-medium leading-7 text-slate-100/88 sm:mt-8 sm:text-xl sm:leading-9">
-          {heroCopy.subtitle}
+          {copy.subtitle}
         </p>
 
         <p className="hero-description mx-auto mt-5 hidden max-w-2xl text-sm leading-7 text-slate-300/78 sm:block sm:text-base sm:leading-8">
-          {heroCopy.description}
+          {copy.description}
         </p>
 
         <div className="hero-mobile-cta-row mt-8 flex flex-col items-center justify-center gap-3 sm:mt-9 sm:flex-row">
@@ -418,7 +481,7 @@ function HeroContent({
             onClick={() => onOpenPanel("services")}
             className="hero-cta-link hidden min-h-11 items-center justify-center gap-3 text-sm font-bold uppercase tracking-[0.3em] focus:outline-none focus-visible:rounded-full focus-visible:ring-4 focus-visible:ring-[#d89b3a]/25 sm:inline-flex lg:hidden"
           >
-            MEHR ERFAHREN
+            {copy.moreAbout}
             <span aria-hidden="true">-&gt;</span>
           </button>
           <div className="desktop-hero-actions hidden items-center justify-center gap-5 lg:flex">
@@ -427,14 +490,14 @@ function HeroContent({
               onClick={() => onOpenPanel("offers")}
               className="hero-action-button"
             >
-              WEBSITE ANFRAGEN
+              {copy.requestWebsite}
             </button>
             <button
               type="button"
               onClick={() => onOpenPanel("references")}
               className="hero-action-button"
             >
-              REFERENZEN ANSEHEN
+              {copy.viewReferences}
             </button>
           </div>
           <button
@@ -442,14 +505,14 @@ function HeroContent({
             onClick={() => onOpenPanel("offers")}
             className="hero-action-button sm:hidden"
           >
-            WEBSITE ANFRAGEN →
+            {copy.requestWebsite} <span aria-hidden="true">→</span>
           </button>
           <button
             type="button"
             onClick={() => onOpenPanel("references")}
             className="hero-action-button sm:hidden"
           >
-            REFERENZEN ANSEHEN
+            {copy.viewReferences}
           </button>
         </div>
       </div>
@@ -457,16 +520,40 @@ function HeroContent({
   );
 }
 
+function LocalizedHeadlineLines({
+  lines,
+  className,
+}: {
+  lines: HeadlineLine[];
+  className: string;
+}) {
+  return lines.map((line, index) => (
+    <span key={index} className={className}>
+      {line.text ?? line.prefix}
+      {line.accent && (
+        <span className="hero-title-gold">{line.accent}</span>
+      )}
+    </span>
+  ));
+}
+
 function HeroNavigation({
+  locale,
+  copy,
   brandLogo,
   onOpenPanel,
 }: {
+  locale: Locale;
+  copy: SiteDictionary["hero"];
   brandLogo: ReactNode;
   onOpenPanel: OpenPanel;
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [desktopLanguageMenuOpen, setDesktopLanguageMenuOpen] = useState(false);
   const mobileMenuDialogRef = useRef<HTMLDialogElement | null>(null);
   const mobileMenuTriggerRef = useRef<HTMLButtonElement>(null);
+  const desktopLanguageMenuRef = useRef<HTMLDivElement | null>(null);
+  const desktopLanguageTriggerRef = useRef<HTMLButtonElement | null>(null);
   const restoreFocusAfterCloseRef = useRef(true);
 
   useEffect(() => {
@@ -524,6 +611,7 @@ function HeroNavigation({
 
     function closeMenuAtDesktopBreakpoint(event: MediaQueryListEvent) {
       if (!event.matches) {
+        setDesktopLanguageMenuOpen(false);
         return;
       }
 
@@ -539,6 +627,72 @@ function HeroNavigation({
         closeMenuAtDesktopBreakpoint,
       );
   }, []);
+
+  useEffect(() => {
+    if (!desktopLanguageMenuOpen) {
+      return;
+    }
+
+    function closeOnOutsidePointer(event: PointerEvent) {
+      const menu = desktopLanguageMenuRef.current;
+
+      if (event.target instanceof Node && menu && !menu.contains(event.target)) {
+        setDesktopLanguageMenuOpen(false);
+      }
+    }
+
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      event.preventDefault();
+      setDesktopLanguageMenuOpen(false);
+      desktopLanguageTriggerRef.current?.focus({ preventScroll: true });
+    }
+
+    document.addEventListener("pointerdown", closeOnOutsidePointer);
+    document.addEventListener("keydown", closeOnEscape);
+
+    return () => {
+      document.removeEventListener("pointerdown", closeOnOutsidePointer);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [desktopLanguageMenuOpen]);
+
+  function handleDesktopLanguageMenuKeyDown(
+    event: ReactKeyboardEvent<HTMLDivElement>,
+  ) {
+    if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
+      return;
+    }
+
+    const options = Array.from(
+      event.currentTarget.querySelectorAll<HTMLAnchorElement>('[role="menuitem"]'),
+    );
+
+    if (options.length === 0) {
+      return;
+    }
+
+    event.preventDefault();
+    const currentIndex = options.indexOf(
+      document.activeElement as HTMLAnchorElement,
+    );
+    let nextIndex = currentIndex;
+
+    if (event.key === "Home") {
+      nextIndex = 0;
+    } else if (event.key === "End") {
+      nextIndex = options.length - 1;
+    } else if (event.key === "ArrowDown") {
+      nextIndex = currentIndex < options.length - 1 ? currentIndex + 1 : 0;
+    } else {
+      nextIndex = currentIndex > 0 ? currentIndex - 1 : options.length - 1;
+    }
+
+    options[nextIndex]?.focus({ preventScroll: true });
+  }
 
   function closeMobileMenuImmediately(restoreFocus = true) {
     const dialog = mobileMenuDialogRef.current;
@@ -591,8 +745,12 @@ function HeroNavigation({
     });
   }
 
+  function rememberLocale(nextLocale: Locale) {
+    document.cookie = `${localeCookieName}=${nextLocale}; Path=/; Max-Age=31536000; SameSite=Lax`;
+  }
+
   return (
-    <nav aria-label="Hauptnavigation" className="hero-nav hero-reveal hero-reveal-delay-2">
+    <nav aria-label={copy.navigationLabel} className="hero-nav hero-reveal hero-reveal-delay-2">
       <div className="mobile-hero-actions lg:hidden">
         <button
           ref={mobileMenuTriggerRef}
@@ -606,7 +764,11 @@ function HeroNavigation({
             <span />
             <span />
           </span>
-          <span>MENÜ</span>
+          <span className="mobile-menu-label">
+            <span>{localeLabels[locale]}</span>
+            <span aria-hidden="true">&middot;</span>
+            <span>{copy.menuButton}</span>
+          </span>
         </button>
       </div>
 
@@ -614,7 +776,7 @@ function HeroNavigation({
         ref={mobileMenuDialogRef}
         id="mobile-hero-menu"
         className="mobile-menu-dialog"
-        aria-label="Navigation"
+        aria-label={copy.menuDialogLabel}
         aria-modal="true"
         onClose={handleMobileMenuClosed}
         onCancel={(event) => {
@@ -643,7 +805,7 @@ function HeroNavigation({
               autoFocus
               onClick={() => closeMobileMenu()}
               className="mobile-menu-close"
-              aria-label="Menü schließen"
+              aria-label={copy.closeMenuLabel}
             >
               <svg
                 aria-hidden="true"
@@ -658,9 +820,9 @@ function HeroNavigation({
 
           <div className="mobile-menu-body">
             <div className="mobile-menu-primary-list">
-              {standardNavItems.map((item) => (
+              {copy.navigation.map((item) => (
                 <button
-                  key={`mobile-${item.label}-${item.panel}`}
+                  key={`mobile-${item.panel}`}
                   type="button"
                   onClick={() => openMobilePanel(item.panel)}
                   className="mobile-menu-primary-item"
@@ -670,29 +832,53 @@ function HeroNavigation({
               ))}
             </div>
 
+            <div className="mobile-menu-language">
+              <p>{copy.languageSwitcher.label}</p>
+              <div aria-label={copy.languageSwitcher.ariaLabel}>
+                {locales.map((availableLocale) => (
+                  <a
+                    key={availableLocale}
+                    href={`/${availableLocale}`}
+                    hrefLang={availableLocale}
+                    lang={availableLocale}
+                    aria-current={
+                      availableLocale === locale ? "page" : undefined
+                    }
+                    aria-label={formatMessage(
+                      copy.languageSwitcher.changeTo,
+                      { language: localeLabels[availableLocale] },
+                    )}
+                    onClick={() => rememberLocale(availableLocale)}
+                  >
+                    {localeLabels[availableLocale]}
+                  </a>
+                ))}
+              </div>
+            </div>
+
             <div className="mobile-menu-legal">
               <button
                 type="button"
                 onClick={() => openMobilePanel("impressum")}
               >
-                Impressum
+                {copy.legal.impressum}
               </button>
               <span aria-hidden="true">·</span>
               <button
                 type="button"
                 onClick={() => openMobilePanel("privacy")}
               >
-                Datenschutz
+                {copy.legal.privacy}
               </button>
             </div>
           </div>
         </section>
       </dialog>
 
-      <div className="hidden lg:flex lg:w-auto lg:max-w-none lg:flex-wrap lg:justify-end lg:gap-3">
-        {navItems.map((item) => (
+      <div className="desktop-hero-navigation hidden lg:flex lg:w-auto lg:max-w-none lg:flex-nowrap lg:justify-end lg:gap-3">
+        {copy.navigation.map((item) => (
           <button
-            key={`${item.label}-${item.panel}`}
+            key={item.panel}
             type="button"
             onClick={() => onOpenPanel(item.panel)}
             className="hero-nav-pill"
@@ -700,6 +886,73 @@ function HeroNavigation({
             <span>{item.label}</span>
           </button>
         ))}
+
+        <div ref={desktopLanguageMenuRef} className="desktop-language-menu">
+          <button
+            ref={desktopLanguageTriggerRef}
+            type="button"
+            className="hero-nav-pill desktop-language-trigger"
+            aria-label={copy.languageSwitcher.openMenu}
+            aria-expanded={desktopLanguageMenuOpen}
+            aria-haspopup="menu"
+            aria-controls="desktop-language-options"
+            onClick={() =>
+              setDesktopLanguageMenuOpen((currentOpen) => !currentOpen)
+            }
+            onKeyDown={(event) => {
+              if (event.key !== "ArrowDown") {
+                return;
+              }
+
+              event.preventDefault();
+              setDesktopLanguageMenuOpen(true);
+              requestAnimationFrame(() => {
+                desktopLanguageMenuRef.current
+                  ?.querySelector<HTMLAnchorElement>('[role="menuitem"]')
+                  ?.focus({ preventScroll: true });
+              });
+            }}
+          >
+            <span>{localeLabels[locale]}</span>
+            <span className="desktop-language-caret" aria-hidden="true">
+              &#9662;
+            </span>
+          </button>
+
+          {desktopLanguageMenuOpen && (
+            <div
+              id="desktop-language-options"
+              className="desktop-language-dropdown"
+              role="menu"
+              aria-label={copy.languageSwitcher.ariaLabel}
+              onKeyDown={handleDesktopLanguageMenuKeyDown}
+            >
+              {locales.map((availableLocale) => (
+                <a
+                  key={"desktop-" + availableLocale}
+                  href={"/" + availableLocale}
+                  hrefLang={availableLocale}
+                  lang={availableLocale}
+                  role="menuitem"
+                  aria-current={
+                    availableLocale === locale ? "page" : undefined
+                  }
+                  aria-label={formatMessage(
+                    copy.languageSwitcher.changeTo,
+                    { language: localeLabels[availableLocale] },
+                  )}
+                  onClick={() => rememberLocale(availableLocale)}
+                >
+                  <span>{localeLabels[availableLocale]}</span>
+                  <span
+                    className="desktop-language-active-dot"
+                    aria-hidden="true"
+                  />
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </nav>
   );
