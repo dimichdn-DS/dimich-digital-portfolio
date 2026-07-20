@@ -55,7 +55,7 @@ function runProgressiveViewTransition(update: () => void) {
 
 const heroCopy = {
   subtitle:
-    "Moderne Websites, klare Online-Auftritte und digitale Werkzeuge für kleine Unternehmen in Deutschland.",
+    "Moderne Websites für lokale Unternehmen, die professionell auftreten und mehr Anfragen gewinnen möchten.",
   description:
     "Ich entwickle schnelle, hochwertige und mobil optimierte Websites, die professionell wirken und aus Besuchern echte Anfragen machen.",
 };
@@ -208,7 +208,10 @@ export function TechHero({
           id="top"
           className="hero-stage relative isolate min-h-screen overflow-hidden px-4 py-4 sm:px-6 lg:px-8 lg:py-5"
         >
-          <HeroBackgroundVideo poster={videoPoster} />
+          <HeroBackgroundVideo
+            poster={videoPoster}
+            isPaused={activePanel !== null}
+          />
           <HeroBackground />
 
           <div
@@ -226,7 +229,6 @@ export function TechHero({
 
             <div className="hero-main-slot relative flex flex-1 flex-col justify-center py-3 sm:py-10 lg:py-8">
               <HeroContent onOpenPanel={openPanel} />
-              <MobileTrustAccent />
             </div>
 
             <HeroFooter onOpenPanel={openPanel} />
@@ -285,18 +287,6 @@ function HeroFooter({
   );
 }
 
-function MobileTrustAccent() {
-  return (
-    <div className="mobile-trust-accent" aria-label="Leistungsversprechen">
-      <ul className="mobile-trust-list" aria-label="Vorteile">
-        <li>Responsive</li>
-        <li>Klar strukturiert</li>
-        <li>Schnell online</li>
-      </ul>
-    </div>
-  );
-}
-
 function Header({
   brandLogo,
   onReset,
@@ -322,8 +312,36 @@ function Header({
   );
 }
 
-function HeroBackgroundVideo({ poster }: { poster: ReactNode }) {
+function HeroBackgroundVideo({
+  poster,
+  isPaused,
+}: {
+  poster: ReactNode;
+  isPaused: boolean;
+}) {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const [videoReady, setVideoReady] = useState(false);
+
+  useEffect(() => {
+    const video = videoRef.current;
+
+    if (!video) {
+      return;
+    }
+
+    if (isPaused) {
+      video.pause();
+      return;
+    }
+
+    const playPromise = video.play();
+
+    if (playPromise) {
+      void playPromise.catch(() => {
+        // The poster remains available when autoplay is blocked.
+      });
+    }
+  }, [isPaused]);
 
   return (
     <div
@@ -336,6 +354,7 @@ function HeroBackgroundVideo({ poster }: { poster: ReactNode }) {
         {poster}
       </div>
       <video
+        ref={videoRef}
         aria-hidden="true"
         tabIndex={-1}
         autoPlay
@@ -423,7 +442,7 @@ function HeroContent({
             onClick={() => onOpenPanel("offers")}
             className="hero-action-button sm:hidden"
           >
-            WEBSITE ANFRAGEN
+            WEBSITE ANFRAGEN →
           </button>
           <button
             type="button"

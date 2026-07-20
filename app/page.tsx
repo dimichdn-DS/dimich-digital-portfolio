@@ -9,10 +9,21 @@ const desktopPosterSrcSet = getImageProps({
   sizes: "100vw",
 }).props.srcSet;
 
-export default function Home() {
-  const brandLogo = (
-    <span className="brand-wordmark-text">KPTS WERK</span>
+function BrandWordmark() {
+  return (
+    <span className="brand-wordmark" aria-label="KPTS WERK">
+      <span className="brand-wordmark-primary">KPTS</span>
+      <span className="brand-wordmark-secondary">
+        <span className="brand-wordmark-rule" aria-hidden="true" />
+        <span>WERK</span>
+        <span className="brand-wordmark-rule" aria-hidden="true" />
+      </span>
+    </span>
   );
+}
+
+export default function Home() {
+  const brandLogo = <BrandWordmark />;
   const videoPoster = (
     <picture className="hero-background-poster-picture">
       <source

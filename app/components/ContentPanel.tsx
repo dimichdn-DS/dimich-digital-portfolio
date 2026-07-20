@@ -3,8 +3,8 @@
 import Image from "next/image";
 import {
   type KeyboardEvent as ReactKeyboardEvent,
+  type MouseEvent as ReactMouseEvent,
   type PointerEvent as ReactPointerEvent,
-  type UIEvent as ReactUIEvent,
   useEffect,
   useRef,
   useState,
@@ -95,10 +95,10 @@ type ServicePackage = {
   subtitle: string;
   price: string;
   description: string;
-  idealFor: string;
   deliveryTime: string;
   revisions: string;
   features: string[];
+  visibleFeatures: string[];
   ctaLabel: string;
   highlighted?: boolean;
 };
@@ -108,11 +108,9 @@ const servicePackages: ServicePackage[] = [
     id: "start",
     name: "START",
     subtitle: "Professioneller Online-Start",
-    price: "ab 890 €",
+    price: "ab 990 €",
     description:
-      "Professioneller Einstieg für kleine Unternehmen, Selbstständige, Studios und lokale Dienstleister.",
-    idealFor:
-      "Eine kompakte Website, die Leistungen klar präsentiert und erste Kundenanfragen generiert.",
+      "Für Selbstständige, Studios und kleine lokale Unternehmen, die schnell professionell online sichtbar werden möchten.",
     deliveryTime: "7–10 Werktage",
     revisions: "1 Korrekturrunde",
     features: [
@@ -124,17 +122,22 @@ const servicePackages: ServicePackage[] = [
       "Technische Veröffentlichung und Domain-Anbindung",
       "Performance-Grundoptimierung",
     ],
-    ctaLabel: "Paket anfragen",
+    visibleFeatures: [
+      "Onepage mit bis zu 5 Bereichen",
+      "Individuelle Designanpassung",
+      "Responsive für Smartphone und Desktop",
+      "Kontaktformular oder WhatsApp",
+      "SEO-Basis und Veröffentlichung",
+    ],
+    ctaLabel: "START anfragen",
   },
   {
     id: "business",
     name: "BUSINESS",
-    subtitle: "Website für planbare Anfragen",
-    price: "ab 1.690 €",
+    subtitle: "Mehr Sichtbarkeit. Mehr Anfragen.",
+    price: "ab 1.890 €",
     description:
-      "Ein vollständiger Unternehmensauftritt für Firmen, die regelmäßig neue Kunden gewinnen möchten.",
-    idealFor:
-      "Handwerksbetriebe, Restaurants, Studios, Werkstätten, Bauunternehmen und lokale Dienstleister.",
+      "Für Handwerksbetriebe, Gastronomie, Studios, Werkstätten und lokale Dienstleister.",
     deliveryTime: "2–3 Wochen",
     revisions: "2 Korrekturrunden",
     features: [
@@ -147,7 +150,14 @@ const servicePackages: ServicePackage[] = [
       "Performance- und Bildoptimierung",
       "Conversion-orientierte Nutzerführung",
     ],
-    ctaLabel: "Paket anfragen",
+    visibleFeatures: [
+      "Bis zu 5 individuelle Seiten",
+      "Individuelles UX/UI-Design",
+      "Leistungen, Referenzen und Kontakt",
+      "SEO-Struktur und Performance",
+      "Google Maps, WhatsApp und Formulare",
+    ],
+    ctaLabel: "BUSINESS anfragen",
     highlighted: true,
   },
   {
@@ -156,10 +166,8 @@ const servicePackages: ServicePackage[] = [
     subtitle: "Digitale Lösungen nach Maß",
     price: "ab 3.490 €",
     description:
-      "Individuelle digitale Lösung mit erweiterten Funktionen, Automatisierung und Integrationen.",
-    idealFor:
-      "Unternehmen mit komplexeren Prozessen, mehreren Sprachen oder individuellen digitalen Anforderungen.",
-    deliveryTime: "4–6 Wochen",
+      "Für Unternehmen mit individuellen Funktionen, Automatisierung oder komplexeren Integrationen.",
+    deliveryTime: "Projektzeit nach Umfang",
     revisions: "3 Korrekturrunden",
     features: [
       "Individuelle Projektarchitektur",
@@ -170,6 +178,13 @@ const servicePackages: ServicePackage[] = [
       "API- und Drittanbieter-Integrationen",
       "AI-Funktionen nach Projektanforderung",
       "Erweiterte Performance- und SEO-Optimierung",
+    ],
+    visibleFeatures: [
+      "Individuelle Projektarchitektur",
+      "Website oder Web-Anwendung",
+      "Mehrsprachigkeit und CMS",
+      "Terminbuchung und API-Integrationen",
+      "AI-Funktionen nach Projektbedarf",
     ],
     ctaLabel: "Projekt besprechen",
   },
@@ -186,6 +201,7 @@ type PortfolioProject = {
   image: string;
   imageAlt: string;
   imageFit: "cover" | "contain";
+  previewVariant: "landscape" | "portrait";
   liveUrl: string;
   technologies: string[];
   features: string[];
@@ -207,6 +223,7 @@ const portfolioProjects: PortfolioProject[] = [
     imageAlt:
       "Startseite von STEINOutlet mit Küchenkonfigurator und Arbeitsplattenvergleich",
     imageFit: "cover",
+    previewVariant: "landscape",
     liveUrl: "https://kitchen-manufaktur.vercel.app",
     technologies: [
       "Next.js",
@@ -239,6 +256,7 @@ const portfolioProjects: PortfolioProject[] = [
     imageAlt:
       "Mobile Startseite des AURA Nail Atelier mit Navigation und Termin-CTA",
     imageFit: "contain",
+    previewVariant: "portrait",
     liveUrl: "https://aura-landing-two-zeta.vercel.app",
     technologies: ["HTML", "CSS", "JavaScript", "Vercel"],
     features: [
@@ -667,32 +685,20 @@ function OffersPanel({
                     {servicePackage.description}
                   </p>
 
-                  <dl className="service-package-facts">
-                    <div className="service-package-ideal">
-                      <dt>Ideal für</dt>
-                      <dd>{servicePackage.idealFor}</dd>
-                    </div>
-                    <div>
-                      <dt>Umsetzung</dt>
-                      <dd>{servicePackage.deliveryTime}</dd>
-                    </div>
-                    <div>
-                      <dt>Korrekturen</dt>
-                      <dd>{servicePackage.revisions}</dd>
-                    </div>
-                  </dl>
-
-                  <section
-                    className="service-package-features"
-                    aria-labelledby={`${servicePackage.id}-features`}
+                  <ul
+                    className="service-package-feature-list"
+                    aria-label={`${servicePackage.name}: enthaltene Leistungen`}
                   >
-                    <h4 id={`${servicePackage.id}-features`}>Enthalten</h4>
-                    <ul>
-                      {servicePackage.features.map((feature) => (
-                        <li key={feature}>{feature}</li>
-                      ))}
-                    </ul>
-                  </section>
+                    {servicePackage.visibleFeatures.map((feature) => (
+                      <li key={feature}>{feature}</li>
+                    ))}
+                  </ul>
+
+                  <p className="service-package-meta">
+                    <span>{servicePackage.deliveryTime}</span>
+                    <span aria-hidden="true">·</span>
+                    <span>{servicePackage.revisions}</span>
+                  </p>
 
                   <button
                     type="button"
@@ -735,56 +741,119 @@ function OffersPanel({
   );
 }
 
+type ReferenceGesture = {
+  pointerId: number;
+  startX: number;
+  startY: number;
+  startTime: number;
+  intent: "pending" | "horizontal" | "vertical";
+};
+
+function positionReferenceTrack(
+  track: HTMLDivElement,
+  index: number,
+  dragOffset = 0,
+  isDragging = false,
+) {
+  const projectElement = track.children.item(index) as HTMLElement | null;
+
+  if (!projectElement) {
+    return;
+  }
+
+  track.classList.toggle("is-dragging", isDragging);
+  track.style.transform = `translate3d(${-(projectElement.offsetLeft) + dragOffset}px, 0, 0)`;
+}
+
 function ReferencesPanel() {
+  const viewportRef = useRef<HTMLDivElement | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
+  const gestureRef = useRef<ReferenceGesture | null>(null);
+  const dragFrameRef = useRef<number | null>(null);
+  const transformCleanupRef = useRef<number | null>(null);
+  const activeProjectIndexRef = useRef(0);
+  const suppressClickRef = useRef(false);
   const [activeProjectIndex, setActiveProjectIndex] = useState(0);
 
-  function scrollToProject(index: number) {
+  useEffect(() => {
+    const viewport = viewportRef.current;
     const track = trackRef.current;
-    const projectElement = track?.children.item(index) as HTMLElement | null;
 
-    if (!track || !projectElement) {
+    if (!viewport || !track) {
       return;
     }
 
-    const reduceMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-
-    track.scrollTo({
-      left: projectElement.offsetLeft - track.offsetLeft,
-      behavior: reduceMotion ? "auto" : "smooth",
+    const resizeObserver = new ResizeObserver(() => {
+      positionReferenceTrack(track, activeProjectIndexRef.current);
     });
-    setActiveProjectIndex(index);
+
+    resizeObserver.observe(viewport);
+    positionReferenceTrack(track, activeProjectIndexRef.current);
+
+    return () => {
+      resizeObserver.disconnect();
+
+      if (dragFrameRef.current !== null) {
+        cancelAnimationFrame(dragFrameRef.current);
+      }
+
+      if (transformCleanupRef.current !== null) {
+        window.clearTimeout(transformCleanupRef.current);
+      }
+    };
+  }, []);
+
+  function queueTrackPosition(dragOffset: number, isDragging: boolean) {
+    const track = trackRef.current;
+
+    if (!track) {
+      return;
+    }
+
+    if (dragFrameRef.current !== null) {
+      cancelAnimationFrame(dragFrameRef.current);
+    }
+
+    if (transformCleanupRef.current !== null) {
+      window.clearTimeout(transformCleanupRef.current);
+      transformCleanupRef.current = null;
+    }
+
+    track.classList.toggle("is-animating", !isDragging);
+
+    dragFrameRef.current = requestAnimationFrame(() => {
+      positionReferenceTrack(
+        track,
+        activeProjectIndexRef.current,
+        dragOffset,
+        isDragging,
+      );
+      dragFrameRef.current = null;
+    });
+
+    if (!isDragging) {
+      transformCleanupRef.current = window.setTimeout(() => {
+        track.classList.remove("is-animating");
+        transformCleanupRef.current = null;
+      }, 240);
+    }
   }
 
-  function handleProjectScroll(event: ReactUIEvent<HTMLDivElement>) {
-    const track = event.currentTarget;
-    const trackCenter = track.scrollLeft + track.clientWidth / 2;
-    const projects = Array.from(track.children) as HTMLElement[];
-    let closestIndex = 0;
-    let closestDistance = Number.POSITIVE_INFINITY;
+  function showProject(index: number) {
+    const nextIndex = Math.min(
+      Math.max(index, 0),
+      portfolioProjects.length - 1,
+    );
 
-    projects.forEach((project, index) => {
-      const projectCenter =
-        project.offsetLeft - track.offsetLeft + project.offsetWidth / 2;
-      const distance = Math.abs(projectCenter - trackCenter);
-
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closestIndex = index;
-      }
-    });
-
-    if (closestIndex !== activeProjectIndex) {
-      setActiveProjectIndex(closestIndex);
-    }
+    activeProjectIndexRef.current = nextIndex;
+    setActiveProjectIndex(nextIndex);
+    queueTrackPosition(0, false);
   }
 
   function handleCarouselKeyDown(event: ReactKeyboardEvent<HTMLDivElement>) {
     if (event.key === "ArrowLeft" && activeProjectIndex > 0) {
       event.preventDefault();
-      scrollToProject(activeProjectIndex - 1);
+      showProject(activeProjectIndex - 1);
     }
 
     if (
@@ -792,7 +861,129 @@ function ReferencesPanel() {
       activeProjectIndex < portfolioProjects.length - 1
     ) {
       event.preventDefault();
-      scrollToProject(activeProjectIndex + 1);
+      showProject(activeProjectIndex + 1);
+    }
+  }
+
+  function handleProjectPointerDown(event: ReactPointerEvent<HTMLDivElement>) {
+    if (event.pointerType === "mouse" && event.button !== 0) {
+      return;
+    }
+
+    gestureRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      startTime: performance.now(),
+      intent: "pending",
+    };
+    suppressClickRef.current = false;
+    event.currentTarget.classList.add("is-pointer-active");
+  }
+
+  function handleProjectPointerMove(event: ReactPointerEvent<HTMLDivElement>) {
+    const gesture = gestureRef.current;
+
+    if (!gesture || gesture.pointerId !== event.pointerId) {
+      return;
+    }
+
+    const deltaX = event.clientX - gesture.startX;
+    const deltaY = event.clientY - gesture.startY;
+    const absoluteX = Math.abs(deltaX);
+    const absoluteY = Math.abs(deltaY);
+
+    if (gesture.intent === "pending") {
+      if (Math.max(absoluteX, absoluteY) < 10) {
+        return;
+      }
+
+      if (absoluteX >= 10 && absoluteX > absoluteY * 1.15) {
+        gesture.intent = "horizontal";
+        event.currentTarget.setPointerCapture(event.pointerId);
+      } else if (absoluteY >= 10 && absoluteY > absoluteX * 1.05) {
+        gesture.intent = "vertical";
+        return;
+      }
+    }
+
+    if (gesture.intent !== "horizontal") {
+      return;
+    }
+
+    event.preventDefault();
+    suppressClickRef.current = absoluteX > 8;
+
+    const isAtStart = activeProjectIndexRef.current === 0 && deltaX > 0;
+    const isAtEnd =
+      activeProjectIndexRef.current === portfolioProjects.length - 1 &&
+      deltaX < 0;
+    const resistedOffset = isAtStart || isAtEnd ? deltaX * 0.28 : deltaX;
+    const maxOffset = event.currentTarget.clientWidth * 0.92;
+    const dragOffset = Math.max(
+      Math.min(resistedOffset, maxOffset),
+      -maxOffset,
+    );
+
+    queueTrackPosition(dragOffset, true);
+  }
+
+  function finishProjectGesture(event: ReactPointerEvent<HTMLDivElement>) {
+    const gesture = gestureRef.current;
+    gestureRef.current = null;
+    event.currentTarget.classList.remove("is-pointer-active");
+
+    if (!gesture || gesture.pointerId !== event.pointerId) {
+      return;
+    }
+
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+
+    if (gesture.intent !== "horizontal") {
+      return;
+    }
+
+    const deltaX = event.clientX - gesture.startX;
+    const elapsed = Math.max(performance.now() - gesture.startTime, 1);
+    const velocity = deltaX / elapsed;
+    const distanceThreshold = event.currentTarget.clientWidth * 0.22;
+    const shouldChangeProject =
+      Math.abs(deltaX) >= distanceThreshold ||
+      (Math.abs(deltaX) >= 24 && Math.abs(velocity) >= 0.5);
+    const direction = deltaX < 0 ? 1 : -1;
+
+    showProject(
+      shouldChangeProject
+        ? activeProjectIndexRef.current + direction
+        : activeProjectIndexRef.current,
+    );
+
+    window.setTimeout(() => {
+      suppressClickRef.current = false;
+    }, 0);
+  }
+
+  function cancelProjectGesture(event: ReactPointerEvent<HTMLDivElement>) {
+    const gesture = gestureRef.current;
+    gestureRef.current = null;
+    event.currentTarget.classList.remove("is-pointer-active");
+
+    if (
+      gesture &&
+      event.currentTarget.hasPointerCapture(gesture.pointerId)
+    ) {
+      event.currentTarget.releasePointerCapture(gesture.pointerId);
+    }
+
+    queueTrackPosition(0, false);
+  }
+
+  function handleProjectClickCapture(event: ReactMouseEvent<HTMLDivElement>) {
+    if (suppressClickRef.current) {
+      event.preventDefault();
+      event.stopPropagation();
     }
   }
 
@@ -807,7 +998,7 @@ function ReferencesPanel() {
         <div className="portfolio-carousel-arrows" aria-label="Projekt wechseln">
           <button
             type="button"
-            onClick={() => scrollToProject(activeProjectIndex - 1)}
+            onClick={() => showProject(activeProjectIndex - 1)}
             disabled={activeProjectIndex === 0}
             aria-label="Vorheriges Projekt"
           >
@@ -815,7 +1006,7 @@ function ReferencesPanel() {
           </button>
           <button
             type="button"
-            onClick={() => scrollToProject(activeProjectIndex + 1)}
+            onClick={() => showProject(activeProjectIndex + 1)}
             disabled={activeProjectIndex === portfolioProjects.length - 1}
             aria-label="Nächstes Projekt"
           >
@@ -825,36 +1016,33 @@ function ReferencesPanel() {
       </div>
 
       <div
-        ref={trackRef}
+        ref={viewportRef}
         className="portfolio-carousel-track"
         role="region"
         aria-roledescription="Karussell"
         aria-label="Portfolio-Projekte"
         tabIndex={0}
-        onScroll={handleProjectScroll}
         onKeyDown={handleCarouselKeyDown}
+        onPointerDown={handleProjectPointerDown}
+        onPointerMove={handleProjectPointerMove}
+        onPointerUp={finishProjectGesture}
+        onPointerCancel={cancelProjectGesture}
+        onDragStart={(event) => event.preventDefault()}
+        onClickCapture={handleProjectClickCapture}
       >
-        {portfolioProjects.map((project, index) => (
-          <CaseStudy
-            key={project.id}
-            project={project}
-            index={index}
-            total={portfolioProjects.length}
-          />
-        ))}
-      </div>
-
-      <div className="portfolio-carousel-pagination" aria-label="Projekt auswählen">
-        {portfolioProjects.map((project, index) => (
-          <button
-            key={project.id}
-            type="button"
-            className={index === activeProjectIndex ? "is-active" : undefined}
-            onClick={() => scrollToProject(index)}
-            aria-label={`${project.title} anzeigen`}
-            aria-current={index === activeProjectIndex ? "true" : undefined}
-          />
-        ))}
+        <div ref={trackRef} className="portfolio-carousel-track-inner">
+          {portfolioProjects.map((project, index) => (
+            <CaseStudy
+              key={project.id}
+              project={project}
+              index={index}
+              total={portfolioProjects.length}
+              isActive={index === activeProjectIndex}
+              isAdjacent={Math.abs(index - activeProjectIndex) === 1}
+              onShowProject={showProject}
+            />
+          ))}
+        </div>
       </div>
 
       <p className="portfolio-carousel-hint" aria-hidden="true">
@@ -868,10 +1056,16 @@ function CaseStudy({
   project,
   index,
   total,
+  isActive,
+  isAdjacent,
+  onShowProject,
 }: {
   project: PortfolioProject;
   index: number;
   total: number;
+  isActive: boolean;
+  isAdjacent: boolean;
+  onShowProject: (index: number) => void;
 }) {
   return (
     <article
@@ -879,22 +1073,43 @@ function CaseStudy({
       role="group"
       aria-roledescription="Slide"
       aria-label={`${index + 1} von ${total}: ${project.title}`}
+      aria-hidden={!isActive}
     >
-      <div className="portfolio-browser-frame">
-        <div className="portfolio-browser-bar" aria-hidden="true">
-          <span />
-          <span />
-          <span />
-          <p>{project.liveUrl.replace("https://", "")}</p>
-        </div>
-        <div className={`portfolio-project-image portfolio-project-image-${project.imageFit}`}>
-          <Image
-            src={project.image}
-            alt={project.imageAlt}
-            fill
-            sizes="(max-width: 767px) calc(100vw - 72px), (max-width: 1199px) 78vw, 900px"
-            className="portfolio-project-image-media"
-          />
+      <div
+        className={`portfolio-preview-stage portfolio-preview-stage-${project.previewVariant}`}
+      >
+        <div
+          className={`portfolio-browser-frame portfolio-browser-frame-${project.previewVariant}`}
+        >
+          <div className="portfolio-browser-bar" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+            <p>{project.liveUrl.replace("https://", "")}</p>
+          </div>
+          <div
+            className={`portfolio-project-image portfolio-project-image-${project.imageFit} portfolio-project-image-${project.previewVariant}`}
+          >
+            <Image
+              src={project.image}
+              alt={project.imageAlt}
+              fill
+              sizes={
+                project.previewVariant === "portrait"
+                  ? "(max-width: 767px) 52vw, 290px"
+                  : "(max-width: 767px) calc(100vw - 72px), (max-width: 1199px) 78vw, 900px"
+              }
+              className="portfolio-project-image-media"
+              priority={isActive}
+              loading={isActive ? undefined : isAdjacent ? "eager" : "lazy"}
+              draggable={false}
+              onLoad={(event) => {
+                if (isActive || isAdjacent) {
+                  void event.currentTarget.decode().catch(() => undefined);
+                }
+              }}
+            />
+          </div>
         </div>
       </div>
 
@@ -945,13 +1160,70 @@ function CaseStudy({
             rel="noopener noreferrer"
             aria-label={`${project.title} Live-Website in neuem Tab ansehen`}
             className="portfolio-action"
+            tabIndex={isActive ? 0 : -1}
           >
             Live-Website ansehen
           </a>
-          <a href={`#${project.id}-details`} className="portfolio-action">
+          <a
+            href={`#${project.id}-details`}
+            className="portfolio-action"
+            tabIndex={isActive ? 0 : -1}
+          >
             Details ansehen
           </a>
         </div>
+
+        <nav
+          className="portfolio-project-navigation"
+          aria-label={`${project.title}: Projektnavigation`}
+          onPointerDown={(event) => event.stopPropagation()}
+        >
+          <div className="portfolio-project-navigation-row">
+            <button
+              type="button"
+              className="portfolio-project-navigation-button"
+              onClick={() => onShowProject(index - 1)}
+              disabled={index === 0}
+              tabIndex={isActive ? 0 : -1}
+              aria-label="Vorheriges Projekt"
+            >
+              <CarouselArrow direction="previous" />
+            </button>
+
+            <p className="portfolio-project-navigation-counter" aria-hidden="true">
+              {String(index + 1).padStart(2, "0")} / {" "}
+              {String(total).padStart(2, "0")}
+            </p>
+
+            <button
+              type="button"
+              className="portfolio-project-navigation-button"
+              onClick={() => onShowProject(index + 1)}
+              disabled={index === total - 1}
+              tabIndex={isActive ? 0 : -1}
+              aria-label="Nächstes Projekt"
+            >
+              <CarouselArrow direction="next" />
+            </button>
+          </div>
+
+          <div
+            className="portfolio-carousel-pagination portfolio-project-navigation-dots"
+            aria-label="Projekt auswählen"
+          >
+            {portfolioProjects.map((portfolioProject, projectIndex) => (
+              <button
+                key={portfolioProject.id}
+                type="button"
+                className={projectIndex === index ? "is-active" : undefined}
+                onClick={() => onShowProject(projectIndex)}
+                tabIndex={isActive ? 0 : -1}
+                aria-label={`${portfolioProject.title} anzeigen`}
+                aria-current={projectIndex === index ? "true" : undefined}
+              />
+            ))}
+          </div>
+        </nav>
       </div>
     </article>
   );
