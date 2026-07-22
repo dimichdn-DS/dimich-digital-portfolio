@@ -17,7 +17,10 @@ import {
   locales,
   type Locale,
 } from "../i18n/config";
-import type { HeadlineLine, SiteDictionary } from "../i18n/types";
+import type {
+  HeadlineLine,
+  SiteDictionary,
+} from "../i18n/types";
 
 const WHATSAPP_URL = "https://wa.me/49784442215";
 
@@ -100,6 +103,13 @@ export function TechHero({
   const requestPackage = useCallback((packageName: string) => {
     runProgressiveViewTransition(() => {
       setSelectedPackage(packageName);
+      setActivePanel("contact");
+    });
+  }, []);
+
+  const openContactFromPanel = useCallback(() => {
+    runProgressiveViewTransition(() => {
+      setSelectedPackage(null);
       setActivePanel("contact");
     });
   }, []);
@@ -235,6 +245,7 @@ export function TechHero({
             selectedPackage={selectedPackage}
             onClose={closePanel}
             onRequestPackage={requestPackage}
+            onOpenContact={openContactFromPanel}
             dictionary={dictionary.panels}
           />
         </section>

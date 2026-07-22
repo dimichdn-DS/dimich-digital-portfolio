@@ -3,16 +3,19 @@
 import Image from "next/image";
 import {
   type KeyboardEvent as ReactKeyboardEvent,
-  type MouseEvent as ReactMouseEvent,
   type PointerEvent as ReactPointerEvent,
+  type ReactNode,
   useEffect,
   useRef,
   useState,
 } from "react";
 import { formatMessage } from "../i18n/config";
 import type {
+  IndustryGroupId,
   LocalizedPortfolioProject,
+  LocalizedServicePackage,
   PanelId,
+  ServiceAreaId,
   SiteDictionary,
 } from "../i18n/types";
 
@@ -21,6 +24,8 @@ export type ActivePanel = PanelId;
 const portfolioProjectAssets = {
   steinoutlet: {
     image: "/images/references/steinoutlet-homepage.png",
+    imageWidth: 1440,
+    imageHeight: 810,
     imageFit: "cover" as const,
     previewVariant: "landscape" as const,
     liveUrl: "https://kitchen-manufaktur.vercel.app",
@@ -35,6 +40,8 @@ const portfolioProjectAssets = {
   },
   aura: {
     image: "/images/references/aura-homepage.png",
+    imageWidth: 390,
+    imageHeight: 844,
     imageFit: "contain" as const,
     previewVariant: "portrait" as const,
     liveUrl: "https://aura-landing-two-zeta.vercel.app",
@@ -51,22 +58,26 @@ type BriefingChannel = "whatsapp" | "email";
 
 const CONTACT_EMAIL = "dimich.dn@gmail.com";
 const WHATSAPP_URL = "https://wa.me/49784442215";
+const aboutWideServiceIndexes = new Set([2, 3, 5, 6, 9, 11]);
 
 export function ContentPanel({
   activePanel,
   onClose,
   onRequestPackage,
+  onOpenContact,
   selectedPackage,
   dictionary,
 }: {
   activePanel: ActivePanel | null;
   onClose: () => void;
   onRequestPackage: (packageName: string) => void;
+  onOpenContact: () => void;
   selectedPackage: string | null;
   dictionary: SiteDictionary["panels"];
 }) {
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const panelRef = useRef<HTMLElement | null>(null);
+  const panelScrollRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!activePanel) {
@@ -80,6 +91,7 @@ export function ContentPanel({
     }
 
     const panelElement: HTMLElement = activePanelElement;
+    panelScrollRef.current?.scrollTo({ top: 0 });
 
     const focusableSelector = [
       "a[href]",
@@ -169,16 +181,18 @@ export function ContentPanel({
       >
         <header className="content-panel-header">
           <div className="content-panel-heading">
-            <p
-              id={
-                activePanel === "references" || activePanel === "offers"
-                  ? "content-panel-title"
-                  : undefined
-              }
-              className="content-panel-eyebrow"
-            >
-              {meta.label}
-            </p>
+            {activePanel !== "about" && activePanel !== "services" && (
+              <p
+                id={
+                  activePanel === "references" || activePanel === "offers"
+                    ? "content-panel-title"
+                    : undefined
+                }
+                className="content-panel-eyebrow"
+              >
+                {meta.label}
+              </p>
+            )}
             {activePanel !== "references" && activePanel !== "offers" && (
               <h2 id="content-panel-title" className="content-panel-title">
                 {meta.title}
@@ -207,6 +221,7 @@ export function ContentPanel({
         </header>
 
         <div
+          ref={panelScrollRef}
           className="content-panel-scroll"
           role="region"
           tabIndex={0}
@@ -216,7 +231,10 @@ export function ContentPanel({
         >
           <div className="content-panel-body">
             {activePanel === "about" && (
-              <AboutPanel content={dictionary.about} />
+              <AboutPanel
+                content={dictionary.about}
+                onOpenContact={onOpenContact}
+              />
             )}
             {activePanel === "services" && (
               <ServicesPanel content={dictionary.services} />
@@ -225,10 +243,18 @@ export function ContentPanel({
               <OffersPanel
                 content={dictionary.offers}
                 onRequestPackage={onRequestPackage}
+                onViewChange={() => {
+                  panelScrollRef.current?.scrollTo({ top: 0 });
+                }}
               />
             )}
             {activePanel === "references" && (
-              <ReferencesPanel content={dictionary.references} />
+              <ReferencesPanel
+                content={dictionary.references}
+                onProjectChange={() => {
+                  panelScrollRef.current?.scrollTo({ top: 0 });
+                }}
+              />
             )}
             {activePanel === "contact" && (
               <ContactPanel
@@ -255,275 +281,944 @@ export function ContentPanel({
 
 function AboutPanel({
   content,
+  onOpenContact,
 }: {
   content: SiteDictionary["panels"]["about"];
+  onOpenContact: () => void;
 }) {
   return (
     <div className="panel-editorial panel-about">
-      <p className="panel-lead">
-        {content.lead}
-      </p>
+      <section className="about-intro">
+        <div className="about-intro-copy">
+          <p className="about-lead">{content.lead}</p>
+          <p className="about-supporting">{content.supporting}</p>
+        </div>
 
-      <p className="panel-copy">
-        {content.copy}
-      </p>
+        <figure className="about-visual">
+          <Image
+            src="/images/hero/kpts-werk/kpts-werk-office-final-v2-desktop-16x9.png"
+            alt={content.visualAlt}
+            fill
+            sizes="(min-width: 1024px) 38vw, 1px"
+          />
+          <span className="about-visual-shade" aria-hidden="true" />
+        </figure>
+      </section>
 
-      <p className="panel-accent-copy">
-        {content.accent}
-      </p>
+      <section className="about-section" aria-labelledby="about-approach-heading">
+        <h3 id="about-approach-heading" className="about-section-heading">
+          {content.approachHeading}
+        </h3>
+        <div className="about-principles">
+          {content.principles.map((principle, index) => (
+            <article key={principle.title} className="about-principle-card">
+              <AboutPrincipleIcon index={index} />
+              <h4>{principle.title}</h4>
+              <p>{principle.description}</p>
+            </article>
+          ))}
+        </div>
+      </section>
 
-      <dl className="panel-facts" aria-label={content.factsLabel}>
-        {content.facts.map((fact) => (
-          <div key={fact.term}>
-            <dt>{fact.term}</dt>
-            <dd>{fact.description}</dd>
-          </div>
-        ))}
-      </dl>
+      <section className="about-section" aria-labelledby="about-services-heading">
+        <h3 id="about-services-heading" className="about-section-heading">
+          {content.servicesHeading}
+        </h3>
+        <div className="about-services-grid">
+          {content.services.map((service, index) => (
+            <article
+              key={service.title}
+              className={`about-service-card${aboutWideServiceIndexes.has(index) ? " about-service-card-wide" : ""}`}
+            >
+              <span className="about-service-index" aria-hidden="true">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <h4>{service.title}</h4>
+              <p>{service.description}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="about-section" aria-labelledby="about-workflow-heading">
+        <h3 id="about-workflow-heading" className="about-section-heading">
+          {content.workflowHeading}
+        </h3>
+        <ol className="about-workflow">
+          {content.workflow.map((step, index) => (
+            <li key={step.title}>
+              <span className="about-workflow-index" aria-hidden="true">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <h4>{step.title}</h4>
+              <p>{step.description}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section className="about-final-cta" aria-labelledby="about-cta-heading">
+        <div>
+          <h3 id="about-cta-heading">{content.cta.title}</h3>
+          <p>{content.cta.copy}</p>
+        </div>
+        <button type="button" onClick={onOpenContact}>
+          {content.cta.button}
+          <span aria-hidden="true">→</span>
+        </button>
+      </section>
     </div>
   );
 }
 
-function ServicesPanel({
-  content,
-}: {
+function AboutPrincipleIcon({ index }: { index: number }) {
+  const paths = [
+    <>
+      <circle cx="12" cy="12" r="7" />
+      <circle cx="12" cy="12" r="2.2" />
+      <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
+    </>,
+    <>
+      <path d="M13.5 2.8 5.8 13h5l-1.3 8.2L18.2 10h-5.1l.4-7.2Z" />
+    </>,
+    <>
+      <path d="M4 12.5 9.1 17 20 6.5" />
+      <path d="M4 6.5h5M15 17h5" />
+    </>,
+  ];
+
+  return (
+    <span className="about-principle-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none">
+        {paths[index]}
+      </svg>
+    </span>
+  );
+}
+
+function ServicesPanel({ content }: {
   content: SiteDictionary["panels"]["services"];
 }) {
+  const [openServiceIndex, setOpenServiceIndex] = useState<number | null>(null);
+  const [openIndustryIndex, setOpenIndustryIndex] = useState<number | null>(null);
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(min-width: 768px)");
+    const syncDesktopState = () => setIsDesktop(mediaQuery.matches);
+
+    syncDesktopState();
+    mediaQuery.addEventListener("change", syncDesktopState);
+    return () => mediaQuery.removeEventListener("change", syncDesktopState);
+  }, []);
+
   return (
-    <div className="panel-editorial">
-      <p className="panel-intro">
-        {content.intro}
-      </p>
+    <div className="panel-editorial panel-services">
+      <section className="services-intro" aria-labelledby="services-intro-title">
+        <h3 id="services-intro-title">{content.intro.headline}</h3>
+        <p>{content.intro.copy}</p>
+        <ul className="services-results">
+          {content.results.map((result) => (
+            <li key={result}>
+              <ServiceResultIcon />
+              <span>{result}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
 
-      <div className="panel-service-list">
-        {content.items.map((service) => (
-          <article key={service.title} className="panel-service-row">
-            <h3>{service.title}</h3>
-            <p>{service.description}</p>
-            <span aria-hidden="true">→</span>
-          </article>
-        ))}
-      </div>
+      <section className="services-areas" aria-labelledby="services-areas-title">
+        <h3 id="services-areas-title" className="sr-only">
+          {content.intro.headline}
+        </h3>
+        <div className="services-area-grid">
+          {content.areas.map((area, index) => {
+            const isExpanded = isDesktop || openServiceIndex === index;
+            const capabilitiesId = `service-area-capabilities-${area.id}`;
 
-      <p className="panel-sector-line">{content.sectors.join(" · ")}</p>
+            return (
+              <article
+                key={area.id}
+                className={`service-area-card${isExpanded ? " is-expanded" : ""}`}
+              >
+                <button
+                  type="button"
+                  className="service-area-toggle"
+                  aria-expanded={isExpanded}
+                  aria-controls={capabilitiesId}
+                  onKeyDown={(event) => {
+                    if (
+                      !isDesktop &&
+                      (event.key === "Enter" || event.key === " ")
+                    ) {
+                      event.preventDefault();
+                      setOpenServiceIndex((current) =>
+                        current === index ? null : index,
+                      );
+                    }
+                  }}
+                  onClick={() => {
+                    if (!isDesktop) {
+                      setOpenServiceIndex((current) =>
+                        current === index ? null : index,
+                      );
+                    }
+                  }}
+                >
+                  <ServiceAreaIcon id={area.id} />
+                  <span className="service-area-heading">
+                    <strong>{area.title}</strong>
+                    <span>{area.description}</span>
+                  </span>
+                  <span className="service-area-toggle-label">
+                    {isExpanded ? content.accordion.hide : content.accordion.show}
+                    <ServiceChevron />
+                  </span>
+                </button>
+
+                <div
+                  id={capabilitiesId}
+                  className="service-area-capabilities"
+                  aria-hidden={!isExpanded}
+                  data-expanded={isExpanded ? "true" : "false"}
+                >
+                  <div className="service-area-details">
+                    <p className="service-area-suitable">
+                      <span>{content.areaLabels.suitableFor}</span>
+                      {area.suitableFor}
+                    </p>
+                    {area.spotlight && (
+                      <div className="service-area-spotlight">
+                        <strong>{area.spotlight.title}</strong>
+                        <p>{area.spotlight.copy}</p>
+                      </div>
+                    )}
+                    <ul>
+                      {area.capabilities.map((capability) => (
+                        <li key={capability}>{capability}</li>
+                      ))}
+                    </ul>
+                    <div className="service-area-result">
+                      <span>{content.areaLabels.result}</span>
+                      <p>{area.result}</p>
+                    </div>
+                    {area.note && (
+                      <p className="service-area-note">{area.note}</p>
+                    )}
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+
+      <section
+        className="services-industries"
+        aria-labelledby="services-industries-title"
+      >
+        <div className="services-industries-heading">
+          <h3 id="services-industries-title">{content.industries.heading}</h3>
+          <p>{content.industries.copy}</p>
+        </div>
+
+        <div className="services-industry-grid">
+          {content.industries.groups.map((group, index) => {
+            const isExpanded = isDesktop || openIndustryIndex === index;
+            const examplesId = `service-industry-examples-${group.id}`;
+
+            return (
+              <article
+                key={group.id}
+                className={`service-industry-card${isExpanded ? " is-expanded" : ""}`}
+              >
+                <button
+                  type="button"
+                  className="service-industry-toggle"
+                  aria-expanded={isExpanded}
+                  aria-controls={examplesId}
+                  onKeyDown={(event) => {
+                    if (
+                      !isDesktop &&
+                      (event.key === "Enter" || event.key === " ")
+                    ) {
+                      event.preventDefault();
+                      setOpenIndustryIndex((current) =>
+                        current === index ? null : index,
+                      );
+                    }
+                  }}
+                  onClick={() => {
+                    if (!isDesktop) {
+                      setOpenIndustryIndex((current) =>
+                        current === index ? null : index,
+                      );
+                    }
+                  }}
+                >
+                  <IndustryGroupIcon id={group.id} />
+                  <span className="service-industry-heading">
+                    <strong>{group.title}</strong>
+                    <span>{group.description}</span>
+                  </span>
+                  <span className="service-industry-toggle-label">
+                    {isExpanded ? content.accordion.hide : content.accordion.show}
+                    <ServiceChevron />
+                  </span>
+                </button>
+
+                <div
+                  id={examplesId}
+                  className="service-industry-examples"
+                  aria-hidden={!isExpanded}
+                  data-expanded={isExpanded ? "true" : "false"}
+                >
+                  <div>
+                    <ul>
+                      {group.examples.map((example) => (
+                        <li key={example}>{example}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+
+        <p className="services-industries-note">{content.industries.note}</p>
+      </section>
+
+      <section
+        className="services-deliverables"
+        aria-labelledby="services-deliverables-title"
+      >
+        <h3 id="services-deliverables-title">
+          {content.deliverables.heading}
+        </h3>
+        <ul>
+          {content.deliverables.items.map((item) => (
+            <li key={item}>
+              <ServiceResultIcon />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
     </div>
   );
+}
+
+function ServiceResultIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 20 20" fill="none">
+      <circle cx="10" cy="10" r="7.5" />
+      <path d="m6.7 10.1 2.1 2.2 4.7-4.8" />
+    </svg>
+  );
+}
+
+function ServiceChevron() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 20 20" fill="none">
+      <path d="m6 8 4 4 4-4" />
+    </svg>
+  );
+}
+
+function ServiceAreaIcon({ id }: { id: ServiceAreaId }) {
+  const paths: Record<ServiceAreaId, ReactNode> = {
+    websites: (
+      <>
+        <rect x="3" y="4" width="18" height="14" rx="2" />
+        <path d="M8 21h8M12 18v3M3 8h18" />
+      </>
+    ),
+    visibility: (
+      <>
+        <path d="M3 12s3.2-5 9-5 9 5 9 5-3.2 5-9 5-9-5-9-5Z" />
+        <circle cx="12" cy="12" r="2.5" />
+      </>
+    ),
+    commerce: (
+      <>
+        <rect x="4" y="5" width="16" height="15" rx="2" />
+        <path d="M8 3v4M16 3v4M4 9h16M8 13h3M8 16h6" />
+      </>
+    ),
+    automation: (
+      <>
+        <circle cx="6" cy="12" r="2.2" />
+        <circle cx="18" cy="6" r="2.2" />
+        <circle cx="18" cy="18" r="2.2" />
+        <path d="M8.2 11.2 15.8 7M8.2 12.8l7.6 4.2" />
+      </>
+    ),
+  };
+
+  return (
+    <span className="service-area-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none">
+        {paths[id]}
+      </svg>
+    </span>
+  );
+}
+
+function IndustryGroupIcon({ id }: { id: IndustryGroupId }) {
+  const paths: Record<IndustryGroupId, ReactNode> = {
+    property: (
+      <>
+        <path d="m3 11 9-7 9 7" />
+        <path d="M5 10v10h14V10M9 20v-6h6v6" />
+        <path d="M17.5 5.5c1.6.2 2.8 1.4 3 3" />
+      </>
+    ),
+    trades: (
+      <>
+        <path d="m14.5 5.5 4-2 2 2-2 4" />
+        <path d="m13 7 4 4-8.5 8.5a2.1 2.1 0 0 1-3-3L14 8" />
+        <path d="m5 5 4 4" />
+      </>
+    ),
+    wellness: (
+      <>
+        <path d="M12 21s-7-4.3-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.7-7 10-7 10Z" />
+        <path d="M9 12h6M12 9v6" />
+      </>
+    ),
+    hospitality: (
+      <>
+        <path d="M5 3v8M8 3v8M5 7h3M6.5 11v10" />
+        <path d="M15 3v18M15 3c3 2 4 5 4 8h-4" />
+      </>
+    ),
+    vehicles: (
+      <>
+        <path d="m4 15 2-6h12l2 6" />
+        <path d="M3 15h18v4H3z" />
+        <circle cx="7" cy="19" r="1.5" />
+        <circle cx="17" cy="19" r="1.5" />
+      </>
+    ),
+    professional: (
+      <>
+        <rect x="4" y="7" width="16" height="13" rx="2" />
+        <path d="M9 7V4h6v3M4 12h16M10 12v2h4v-2" />
+      </>
+    ),
+  };
+
+  return (
+    <span className="service-industry-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none">
+        {paths[id]}
+      </svg>
+    </span>
+  );
+}
+
+type PackageGesture = {
+  pointerId: number;
+  startX: number;
+  startY: number;
+  startTime: number;
+  intent: "pending" | "horizontal" | "vertical";
+};
+
+function positionPackageTrack(
+  track: HTMLDivElement,
+  index: number,
+  dragOffset = 0,
+) {
+  const card = track.children.item(index) as HTMLElement | null;
+
+  if (card) {
+    track.style.transform = `translate3d(${-card.offsetLeft + dragOffset}px, 0, 0)`;
+  }
 }
 
 function OffersPanel({
   content,
   onRequestPackage,
+  onViewChange,
 }: {
   content: SiteDictionary["panels"]["offers"];
   onRequestPackage: (packageName: string) => void;
+  onViewChange: () => void;
 }) {
   const servicePackages = content.packages;
-  const gestureStartRef = useRef<{ x: number; y: number } | null>(null);
+  const viewportRef = useRef<HTMLDivElement | null>(null);
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const actionRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const backButtonRef = useRef<HTMLButtonElement | null>(null);
+  const gestureRef = useRef<PackageGesture | null>(null);
+  const dragFrameRef = useRef<number | null>(null);
+  const snapCleanupRef = useRef<number | null>(null);
+  const activePackageIndexRef = useRef(0);
+  const suppressClickRef = useRef(false);
   const [activePackageIndex, setActivePackageIndex] = useState(0);
+  const [selectedPackageId, setSelectedPackageId] = useState<
+    LocalizedServicePackage["id"] | null
+  >(null);
 
-  function showPackage(index: number) {
-    const nextIndex = Math.min(
-      Math.max(index, 0),
-      servicePackages.length - 1,
-    );
-
-    setActivePackageIndex(nextIndex);
-  }
-
-  function handlePackageKeyDown(event: ReactKeyboardEvent<HTMLDivElement>) {
-    if (event.key === "ArrowLeft" && activePackageIndex > 0) {
-      event.preventDefault();
-      showPackage(activePackageIndex - 1);
-    }
-
-    if (
-      event.key === "ArrowRight" &&
-      activePackageIndex < servicePackages.length - 1
-    ) {
-      event.preventDefault();
-      showPackage(activePackageIndex + 1);
-    }
-  }
-
-  function handlePackagePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
-    if (event.pointerType === "mouse" && event.button !== 0) {
+  useEffect(() => {
+    if (selectedPackageId) {
       return;
     }
 
-    gestureStartRef.current = { x: event.clientX, y: event.clientY };
-    event.currentTarget.setPointerCapture(event.pointerId);
+    const viewport = viewportRef.current;
+    const track = trackRef.current;
+
+    if (!viewport || !track) {
+      return;
+    }
+
+    const resizeObserver = new ResizeObserver(() => {
+      positionPackageTrack(track, activePackageIndexRef.current);
+    });
+
+    resizeObserver.observe(viewport);
+    positionPackageTrack(track, activePackageIndexRef.current);
+
+    return () => resizeObserver.disconnect();
+  }, [selectedPackageId]);
+
+  useEffect(
+    () => () => {
+      if (dragFrameRef.current !== null) {
+        cancelAnimationFrame(dragFrameRef.current);
+      }
+
+      if (snapCleanupRef.current !== null) {
+        window.clearTimeout(snapCleanupRef.current);
+      }
+    },
+    [],
+  );
+
+  function queueTrackPosition(index: number, dragOffset = 0) {
+    const track = trackRef.current;
+
+    if (!track) {
+      return;
+    }
+
+    if (dragFrameRef.current !== null) {
+      cancelAnimationFrame(dragFrameRef.current);
+    }
+
+    dragFrameRef.current = requestAnimationFrame(() => {
+      positionPackageTrack(track, index, dragOffset);
+      dragFrameRef.current = null;
+    });
   }
 
-  function handlePackagePointerUp(event: ReactPointerEvent<HTMLDivElement>) {
-    const start = gestureStartRef.current;
-    gestureStartRef.current = null;
+  function snapTrackTo(index: number) {
+    const track = trackRef.current;
+
+    if (!track) {
+      return;
+    }
+
+    if (snapCleanupRef.current !== null) {
+      window.clearTimeout(snapCleanupRef.current);
+    }
+
+    track.classList.remove("is-dragging");
+    track.classList.add("is-snapping");
+    queueTrackPosition(index);
+    snapCleanupRef.current = window.setTimeout(() => {
+      track.classList.remove("is-snapping");
+      snapCleanupRef.current = null;
+    }, 210);
+  }
+
+  function showPackage(index: number) {
+    const total = servicePackages.length;
+    const nextIndex = (index + total) % total;
+
+    activePackageIndexRef.current = nextIndex;
+    setActivePackageIndex(nextIndex);
+    snapTrackTo(nextIndex);
+  }
+
+  function openPackageDetails(index: number) {
+    if (suppressClickRef.current) {
+      return;
+    }
+
+    activePackageIndexRef.current = index;
+    setActivePackageIndex(index);
+    setSelectedPackageId(servicePackages[index].id);
+    onViewChange();
+    requestAnimationFrame(() => {
+      backButtonRef.current?.focus({ preventScroll: true });
+    });
+  }
+
+  function closePackageDetails() {
+    setSelectedPackageId(null);
+    onViewChange();
+    requestAnimationFrame(() => {
+      actionRefs.current[activePackageIndexRef.current]?.focus({
+        preventScroll: true,
+      });
+    });
+  }
+
+  function handlePackageKeyDown(event: ReactKeyboardEvent<HTMLDivElement>) {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      showPackage(activePackageIndexRef.current - 1);
+    } else if (event.key === "ArrowRight") {
+      event.preventDefault();
+      showPackage(activePackageIndexRef.current + 1);
+    } else if (event.key === "Home") {
+      event.preventDefault();
+      showPackage(0);
+    } else if (event.key === "End") {
+      event.preventDefault();
+      showPackage(servicePackages.length - 1);
+    }
+  }
+
+  function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
+    suppressClickRef.current = false;
+
+    if (
+      window.matchMedia("(min-width: 768px)").matches ||
+      (event.pointerType === "mouse" && event.button !== 0) ||
+      (event.target as HTMLElement).closest("button, a")
+    ) {
+      return;
+    }
+
+    gestureRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      startTime: performance.now(),
+      intent: "pending",
+    };
+  }
+
+  function handlePointerMove(event: ReactPointerEvent<HTMLDivElement>) {
+    const gesture = gestureRef.current;
+
+    if (!gesture || gesture.pointerId !== event.pointerId) {
+      return;
+    }
+
+    const deltaX = event.clientX - gesture.startX;
+    const deltaY = event.clientY - gesture.startY;
+    const absoluteX = Math.abs(deltaX);
+    const absoluteY = Math.abs(deltaY);
+
+    if (Math.max(absoluteX, absoluteY) > 8) {
+      suppressClickRef.current = true;
+    }
+
+    if (gesture.intent === "pending") {
+      if (Math.max(absoluteX, absoluteY) < 8) {
+        return;
+      }
+
+      if (absoluteX >= 8 && absoluteX > absoluteY * 1.2) {
+        gesture.intent = "horizontal";
+        event.currentTarget.setPointerCapture(event.pointerId);
+        trackRef.current?.classList.add("is-dragging");
+      } else if (absoluteY >= 8) {
+        gesture.intent = "vertical";
+        return;
+      }
+    }
+
+    if (gesture.intent !== "horizontal") {
+      return;
+    }
+
+    event.preventDefault();
+    const width = viewportRef.current?.clientWidth ?? event.currentTarget.clientWidth;
+    const limitedOffset = Math.max(
+      Math.min(deltaX, width * 0.72),
+      -width * 0.72,
+    );
+    queueTrackPosition(activePackageIndexRef.current, limitedOffset);
+  }
+
+  function finishPointerGesture(
+    event: ReactPointerEvent<HTMLDivElement>,
+    cancelled = false,
+  ) {
+    const gesture = gestureRef.current;
+    gestureRef.current = null;
+
+    if (!gesture || gesture.pointerId !== event.pointerId) {
+      return;
+    }
 
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
 
-    if (!start) {
+    trackRef.current?.classList.remove("is-dragging");
+
+    if (cancelled || gesture.intent !== "horizontal") {
+      snapTrackTo(activePackageIndexRef.current);
       return;
     }
 
-    const deltaX = event.clientX - start.x;
-    const deltaY = event.clientY - start.y;
-    const isHorizontalIntent =
-      Math.abs(deltaX) >= 42 && Math.abs(deltaX) > Math.abs(deltaY) * 1.15;
+    const deltaX = event.clientX - gesture.startX;
+    const elapsed = Math.max(performance.now() - gesture.startTime, 1);
+    const velocity = Math.abs(deltaX) / elapsed;
+    const width = viewportRef.current?.clientWidth ?? event.currentTarget.clientWidth;
+    const shouldSwitch =
+      Math.abs(deltaX) >= width * 0.2 ||
+      (Math.abs(deltaX) >= 16 && velocity >= 0.5);
 
-    if (!isHorizontalIntent) {
-      return;
+    if (shouldSwitch) {
+      showPackage(activePackageIndexRef.current + (deltaX < 0 ? 1 : -1));
+    } else {
+      snapTrackTo(activePackageIndexRef.current);
     }
+  }
 
-    showPackage(activePackageIndex + (deltaX < 0 ? 1 : -1));
+  const activePackage = servicePackages[activePackageIndex];
+  const selectedPackage = selectedPackageId
+    ? servicePackages.find((servicePackage) => servicePackage.id === selectedPackageId)
+    : null;
+
+  if (selectedPackage) {
+    return (
+      <PackageDetail
+        servicePackage={selectedPackage}
+        packageIndex={activePackageIndex}
+        packageCount={servicePackages.length}
+        content={content}
+        backButtonRef={backButtonRef}
+        onBack={closePackageDetails}
+        onRequest={() => onRequestPackage(selectedPackage.name)}
+      />
+    );
   }
 
   return (
-    <div className="panel-editorial panel-offers">
-      <div className="portfolio-carousel-toolbar service-package-carousel-toolbar">
-        <p className="portfolio-carousel-counter" aria-live="polite">
-          {String(activePackageIndex + 1).padStart(2, "0")} / {" "}
-          {String(servicePackages.length).padStart(2, "0")}
-        </p>
-
-        <div
-          className="portfolio-carousel-arrows service-package-carousel-arrows"
-          aria-label={content.changePackage}
-        >
-          <button
-            type="button"
-            onClick={() => showPackage(activePackageIndex - 1)}
-            disabled={activePackageIndex === 0}
-            aria-label={content.previousPackage}
-          >
-            <CarouselArrow direction="previous" />
-          </button>
-          <button
-            type="button"
-            onClick={() => showPackage(activePackageIndex + 1)}
-            disabled={activePackageIndex === servicePackages.length - 1}
-            aria-label={content.nextPackage}
-          >
-            <CarouselArrow direction="next" />
-          </button>
-        </div>
-      </div>
-
+    <div className="panel-editorial panel-offers offer-overview">
       <div
-        className="service-package-carousel"
+        ref={viewportRef}
+        className="offer-carousel-viewport"
         role="region"
         aria-roledescription={content.carouselDescription}
         aria-label={content.carouselLabel}
         tabIndex={0}
         onKeyDown={handlePackageKeyDown}
-        onPointerDown={handlePackagePointerDown}
-        onPointerUp={handlePackagePointerUp}
-        onPointerCancel={() => {
-          gestureStartRef.current = null;
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={(event) => finishPointerGesture(event)}
+        onPointerCancel={(event) => finishPointerGesture(event, true)}
+        onClickCapture={(event) => {
+          if (suppressClickRef.current) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
         }}
       >
-        <div
-          className="service-package-track"
-          style={{ transform: `translate3d(-${activePackageIndex * 100}%, 0, 0)` }}
-        >
+        <div ref={trackRef} className="offer-carousel-track">
           {servicePackages.map((servicePackage, index) => {
             const isActive = index === activePackageIndex;
 
             return (
-              <div
+              <article
                 key={servicePackage.id}
-                className="service-package-slide"
+                className={`offer-compact-card${
+                  servicePackage.highlighted ? " is-highlighted" : ""
+                }${isActive ? " is-active" : ""}`}
                 aria-hidden={!isActive}
+                aria-roledescription={content.slideDescription}
+                aria-label={formatMessage(content.slideLabel, {
+                  current: String(index + 1),
+                  total: String(servicePackages.length),
+                  name: servicePackage.name,
+                })}
+                onClick={(event) => {
+                  if (
+                    isActive &&
+                    !(event.target as HTMLElement).closest("button, a")
+                  ) {
+                    openPackageDetails(index);
+                  }
+                }}
               >
-                <article
-                  className={`service-package-card${
-                    servicePackage.highlighted ? " is-highlighted" : ""
-                  }`}
-                  role="group"
-                  aria-roledescription={content.slideDescription}
-                  aria-label={formatMessage(content.slideLabel, {
-                    current: index + 1,
-                    total: servicePackages.length,
-                    name: servicePackage.name,
-                  })}
-                >
-                  <header className="service-package-header">
-                    <div>
-                      <h3 className="service-package-name">
-                        {servicePackage.name}
-                      </h3>
-                      <p className="service-package-subtitle">
-                        {servicePackage.subtitle}
-                      </p>
-                      <p className="service-package-price">
-                        {servicePackage.price}
-                      </p>
-                    </div>
+                <header className="offer-compact-header">
+                  <div>
                     {servicePackage.highlighted && (
-                      <span className="service-package-recommendation">
+                      <span className="offer-recommendation">
                         {content.recommended}
                       </span>
                     )}
-                  </header>
+                    <h3>{servicePackage.name}</h3>
+                    <p>{servicePackage.compact.subtitle}</p>
+                  </div>
+                  <strong>{servicePackage.price}</strong>
+                </header>
 
-                  <p className="service-package-description">
-                    {servicePackage.description}
-                  </p>
+                <p className="offer-compact-description">
+                  {servicePackage.compact.description}
+                </p>
 
-                  <ul
-                    className="service-package-feature-list"
-                    aria-label={formatMessage(content.includedServices, {
-                      name: servicePackage.name,
-                    })}
-                  >
-                    {servicePackage.visibleFeatures.map((feature) => (
-                      <li key={feature}>{feature}</li>
-                    ))}
-                  </ul>
+                <ul
+                  className="offer-compact-benefits"
+                  aria-label={formatMessage(content.includedServices, {
+                    name: servicePackage.name,
+                  })}
+                >
+                  {servicePackage.compact.benefits.map((benefit) => (
+                    <li key={benefit}>{benefit}</li>
+                  ))}
+                </ul>
 
-                  <p className="service-package-meta">
-                    <span>{servicePackage.deliveryTime}</span>
-                    <span aria-hidden="true">·</span>
-                    <span>{servicePackage.revisions}</span>
-                  </p>
+                <p className="offer-compact-delivery">
+                  <span>{content.deliveryLabel}</span>
+                  <strong>{servicePackage.compact.deliveryTime}</strong>
+                </p>
 
-                  <button
-                    type="button"
-                    className="portfolio-action service-package-action"
-                    onClick={() => onRequestPackage(servicePackage.name)}
-                    aria-label={`${servicePackage.name}: ${servicePackage.ctaLabel}`}
-                    tabIndex={isActive ? 0 : -1}
-                  >
-                    {servicePackage.ctaLabel}
-                  </button>
-                </article>
-              </div>
+                <button
+                  ref={(element) => {
+                    actionRefs.current[index] = element;
+                  }}
+                  type="button"
+                  tabIndex={isActive ? 0 : -1}
+                  onClick={() => openPackageDetails(index)}
+                  aria-label={formatMessage(content.learnMoreAria, {
+                    name: servicePackage.name,
+                  })}
+                  className="portfolio-action offer-learn-more"
+                >
+                  {content.learnMore}
+                </button>
+              </article>
             );
           })}
         </div>
       </div>
 
-      <div
-        className="portfolio-carousel-pagination service-package-pagination"
-        aria-label={content.selectPackage}
-      >
-        {servicePackages.map((servicePackage, index) => (
-          <button
-            key={servicePackage.id}
-            type="button"
-            className={index === activePackageIndex ? "is-active" : undefined}
-            onClick={() => showPackage(index)}
-            aria-label={formatMessage(content.showPackage, {
-              name: servicePackage.name,
-            })}
-            aria-current={index === activePackageIndex ? "true" : undefined}
-          />
-        ))}
+      <div className="offer-carousel-controls">
+        <button
+          type="button"
+          onClick={() => showPackage(activePackageIndex - 1)}
+          aria-label={content.previousPackage}
+        >
+          <CarouselArrow direction="previous" />
+        </button>
+        <p className="portfolio-carousel-counter" aria-live="polite">
+          {String(activePackageIndex + 1).padStart(2, "0")} / {" "}
+          {String(servicePackages.length).padStart(2, "0")}
+        </p>
+        <button
+          type="button"
+          onClick={() => showPackage(activePackageIndex + 1)}
+          aria-label={content.nextPackage}
+        >
+          <CarouselArrow direction="next" />
+        </button>
       </div>
 
-      <p className="service-package-note">
-        {content.note}
+      <p className="sr-only" aria-live="polite" aria-atomic="true">
+        {formatMessage(content.packageChanged, {
+          name: activePackage.name,
+        })}
       </p>
+    </div>
+  );
+}
+
+function PackageDetail({
+  servicePackage,
+  packageIndex,
+  packageCount,
+  content,
+  backButtonRef,
+  onBack,
+  onRequest,
+}: {
+  servicePackage: LocalizedServicePackage;
+  packageIndex: number;
+  packageCount: number;
+  content: SiteDictionary["panels"]["offers"];
+  backButtonRef: React.MutableRefObject<HTMLButtonElement | null>;
+  onBack: () => void;
+  onRequest: () => void;
+}) {
+  return (
+    <div className="panel-editorial panel-offers offer-detail">
+      <div className="offer-detail-toolbar">
+        <button ref={backButtonRef} type="button" onClick={onBack}>
+          <CarouselArrow direction="previous" />
+          <span>{content.backToPackages}</span>
+        </button>
+        <p>
+          {String(packageIndex + 1).padStart(2, "0")} / {" "}
+          {String(packageCount).padStart(2, "0")} · {servicePackage.name}
+        </p>
+      </div>
+
+      <article className={`offer-detail-card${servicePackage.highlighted ? " is-highlighted" : ""}`}>
+        <header className="offer-detail-hero">
+          <div>
+            {servicePackage.highlighted && (
+              <span className="offer-recommendation">{content.recommended}</span>
+            )}
+            <h3 tabIndex={-1} id="offer-detail-title">
+              {servicePackage.name}
+            </h3>
+            <p className="offer-detail-subtitle">
+              {servicePackage.detail.subtitle}
+            </p>
+          </div>
+          <strong className="offer-detail-price">{servicePackage.price}</strong>
+          <p className="offer-detail-description">
+            {servicePackage.detail.description}
+          </p>
+        </header>
+
+        <div className="offer-detail-body">
+          <section aria-labelledby="offer-included-services">
+            <h4 id="offer-included-services">
+              {formatMessage(content.includedServices, {
+                name: servicePackage.name,
+              })}
+            </h4>
+            <ul className="offer-detail-features">
+              {servicePackage.detail.features.map((feature) => (
+                <li key={feature}>{feature}</li>
+              ))}
+            </ul>
+          </section>
+
+          <dl className="offer-detail-meta">
+            <div>
+              <dt>{content.deliveryLabel}</dt>
+              <dd>{servicePackage.detail.deliveryTime}</dd>
+            </div>
+            <div>
+              <dt>{content.revisionsLabel}</dt>
+              <dd>{servicePackage.detail.revisions}</dd>
+            </div>
+          </dl>
+
+          <p className="offer-detail-note">{content.note}</p>
+
+          <button
+            type="button"
+            className="portfolio-action offer-request-action"
+            onClick={onRequest}
+          >
+            {servicePackage.detail.ctaLabel}
+          </button>
+        </div>
+      </article>
     </div>
   );
 }
@@ -540,22 +1235,22 @@ function positionReferenceTrack(
   track: HTMLDivElement,
   index: number,
   dragOffset = 0,
-  isDragging = false,
 ) {
-  const projectElement = track.children.item(index) as HTMLElement | null;
+  const card = track.children.item(index) as HTMLElement | null;
 
-  if (!projectElement) {
+  if (!card) {
     return;
   }
 
-  track.classList.toggle("is-dragging", isDragging);
-  track.style.transform = `translate3d(${-(projectElement.offsetLeft) + dragOffset}px, 0, 0)`;
+  track.style.transform = `translate3d(${-card.offsetLeft + dragOffset}px, 0, 0)`;
 }
 
 function ReferencesPanel({
   content,
+  onProjectChange,
 }: {
   content: SiteDictionary["panels"]["references"];
+  onProjectChange: () => void;
 }) {
   const portfolioProjects: PortfolioProject[] = content.projects.map(
     (project) => ({
@@ -565,14 +1260,32 @@ function ReferencesPanel({
   );
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
+  const actionRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const backButtonRef = useRef<HTMLButtonElement | null>(null);
   const gestureRef = useRef<ReferenceGesture | null>(null);
   const dragFrameRef = useRef<number | null>(null);
-  const transformCleanupRef = useRef<number | null>(null);
+  const snapCleanupRef = useRef<number | null>(null);
   const activeProjectIndexRef = useRef(0);
   const suppressClickRef = useRef(false);
   const [activeProjectIndex, setActiveProjectIndex] = useState(0);
+  const [selectedProjectId, setSelectedProjectId] = useState<
+    PortfolioProject["id"] | null
+  >(null);
 
   useEffect(() => {
+    Object.values(portfolioProjectAssets).forEach((project) => {
+      const image = new window.Image();
+      image.decoding = "async";
+      image.src = project.image;
+      void image.decode().catch(() => undefined);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (selectedProjectId) {
+      return;
+    }
+
     const viewport = viewportRef.current;
     const track = trackRef.current;
 
@@ -587,20 +1300,23 @@ function ReferencesPanel({
     resizeObserver.observe(viewport);
     positionReferenceTrack(track, activeProjectIndexRef.current);
 
-    return () => {
-      resizeObserver.disconnect();
+    return () => resizeObserver.disconnect();
+  }, [selectedProjectId]);
 
+  useEffect(
+    () => () => {
       if (dragFrameRef.current !== null) {
         cancelAnimationFrame(dragFrameRef.current);
       }
 
-      if (transformCleanupRef.current !== null) {
-        window.clearTimeout(transformCleanupRef.current);
+      if (snapCleanupRef.current !== null) {
+        window.clearTimeout(snapCleanupRef.current);
       }
-    };
-  }, []);
+    },
+    [],
+  );
 
-  function queueTrackPosition(dragOffset: number, isDragging: boolean) {
+  function queueTrackPosition(index: number, dragOffset = 0) {
     const track = trackRef.current;
 
     if (!track) {
@@ -611,59 +1327,83 @@ function ReferencesPanel({
       cancelAnimationFrame(dragFrameRef.current);
     }
 
-    if (transformCleanupRef.current !== null) {
-      window.clearTimeout(transformCleanupRef.current);
-      transformCleanupRef.current = null;
-    }
-
-    track.classList.toggle("is-animating", !isDragging);
-
     dragFrameRef.current = requestAnimationFrame(() => {
-      positionReferenceTrack(
-        track,
-        activeProjectIndexRef.current,
-        dragOffset,
-        isDragging,
-      );
+      positionReferenceTrack(track, index, dragOffset);
       dragFrameRef.current = null;
     });
+  }
 
-    if (!isDragging) {
-      transformCleanupRef.current = window.setTimeout(() => {
-        track.classList.remove("is-animating");
-        transformCleanupRef.current = null;
-      }, 240);
+  function snapTrackTo(index: number) {
+    const track = trackRef.current;
+
+    if (!track) {
+      return;
     }
+
+    if (snapCleanupRef.current !== null) {
+      window.clearTimeout(snapCleanupRef.current);
+    }
+
+    track.classList.remove("is-dragging");
+    track.classList.add("is-snapping");
+    queueTrackPosition(index);
+    snapCleanupRef.current = window.setTimeout(() => {
+      track.classList.remove("is-snapping");
+      snapCleanupRef.current = null;
+    }, 210);
   }
 
   function showProject(index: number) {
-    const nextIndex = Math.min(
-      Math.max(index, 0),
-      portfolioProjects.length - 1,
-    );
+    const total = portfolioProjects.length;
+    const nextIndex = (index + total) % total;
 
     activeProjectIndexRef.current = nextIndex;
     setActiveProjectIndex(nextIndex);
-    queueTrackPosition(0, false);
+    snapTrackTo(nextIndex);
+  }
+
+  function openProjectDetails(index: number) {
+    if (suppressClickRef.current) {
+      return;
+    }
+
+    activeProjectIndexRef.current = index;
+    setActiveProjectIndex(index);
+    setSelectedProjectId(portfolioProjects[index].id);
+    onProjectChange();
+    requestAnimationFrame(() => {
+      backButtonRef.current?.focus({ preventScroll: true });
+    });
+  }
+
+  function closeProjectDetails() {
+    setSelectedProjectId(null);
+    onProjectChange();
+    requestAnimationFrame(() => {
+      actionRefs.current[activeProjectIndexRef.current]?.focus({
+        preventScroll: true,
+      });
+    });
   }
 
   function handleCarouselKeyDown(event: ReactKeyboardEvent<HTMLDivElement>) {
-    if (event.key === "ArrowLeft" && activeProjectIndex > 0) {
+    if (event.key === "ArrowLeft") {
       event.preventDefault();
-      showProject(activeProjectIndex - 1);
-    }
-
-    if (
-      event.key === "ArrowRight" &&
-      activeProjectIndex < portfolioProjects.length - 1
-    ) {
+      showProject(activeProjectIndexRef.current - 1);
+    } else if (event.key === "ArrowRight") {
       event.preventDefault();
-      showProject(activeProjectIndex + 1);
+      showProject(activeProjectIndexRef.current + 1);
     }
   }
 
-  function handleProjectPointerDown(event: ReactPointerEvent<HTMLDivElement>) {
-    if (event.pointerType === "mouse" && event.button !== 0) {
+  function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
+    suppressClickRef.current = false;
+
+    if (
+      window.matchMedia("(min-width: 768px)").matches ||
+      (event.pointerType === "mouse" && event.button !== 0) ||
+      (event.target as HTMLElement).closest("button, a")
+    ) {
       return;
     }
 
@@ -674,11 +1414,9 @@ function ReferencesPanel({
       startTime: performance.now(),
       intent: "pending",
     };
-    suppressClickRef.current = false;
-    event.currentTarget.classList.add("is-pointer-active");
   }
 
-  function handleProjectPointerMove(event: ReactPointerEvent<HTMLDivElement>) {
+  function handlePointerMove(event: ReactPointerEvent<HTMLDivElement>) {
     const gesture = gestureRef.current;
 
     if (!gesture || gesture.pointerId !== event.pointerId) {
@@ -690,15 +1428,20 @@ function ReferencesPanel({
     const absoluteX = Math.abs(deltaX);
     const absoluteY = Math.abs(deltaY);
 
+    if (Math.max(absoluteX, absoluteY) > 8) {
+      suppressClickRef.current = true;
+    }
+
     if (gesture.intent === "pending") {
-      if (Math.max(absoluteX, absoluteY) < 10) {
+      if (Math.max(absoluteX, absoluteY) < 8) {
         return;
       }
 
-      if (absoluteX >= 10 && absoluteX > absoluteY * 1.15) {
+      if (absoluteX >= 8 && absoluteX > absoluteY * 1.2) {
         gesture.intent = "horizontal";
         event.currentTarget.setPointerCapture(event.pointerId);
-      } else if (absoluteY >= 10 && absoluteY > absoluteX * 1.05) {
+        trackRef.current?.classList.add("is-dragging");
+      } else if (absoluteY >= 8) {
         gesture.intent = "vertical";
         return;
       }
@@ -709,26 +1452,20 @@ function ReferencesPanel({
     }
 
     event.preventDefault();
-    suppressClickRef.current = absoluteX > 8;
-
-    const isAtStart = activeProjectIndexRef.current === 0 && deltaX > 0;
-    const isAtEnd =
-      activeProjectIndexRef.current === portfolioProjects.length - 1 &&
-      deltaX < 0;
-    const resistedOffset = isAtStart || isAtEnd ? deltaX * 0.28 : deltaX;
-    const maxOffset = event.currentTarget.clientWidth * 0.92;
-    const dragOffset = Math.max(
-      Math.min(resistedOffset, maxOffset),
-      -maxOffset,
+    const width = viewportRef.current?.clientWidth ?? event.currentTarget.clientWidth;
+    const limitedOffset = Math.max(
+      Math.min(deltaX, width * 0.72),
+      -width * 0.72,
     );
-
-    queueTrackPosition(dragOffset, true);
+    queueTrackPosition(activeProjectIndexRef.current, limitedOffset);
   }
 
-  function finishProjectGesture(event: ReactPointerEvent<HTMLDivElement>) {
+  function finishPointerGesture(
+    event: ReactPointerEvent<HTMLDivElement>,
+    cancelled = false,
+  ) {
     const gesture = gestureRef.current;
     gestureRef.current = null;
-    event.currentTarget.classList.remove("is-pointer-active");
 
     if (!gesture || gesture.pointerId !== event.pointerId) {
       return;
@@ -738,232 +1475,290 @@ function ReferencesPanel({
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
 
-    if (gesture.intent !== "horizontal") {
+    trackRef.current?.classList.remove("is-dragging");
+
+    if (cancelled || gesture.intent !== "horizontal") {
+      snapTrackTo(activeProjectIndexRef.current);
       return;
     }
 
     const deltaX = event.clientX - gesture.startX;
     const elapsed = Math.max(performance.now() - gesture.startTime, 1);
-    const velocity = deltaX / elapsed;
-    const distanceThreshold = event.currentTarget.clientWidth * 0.22;
-    const shouldChangeProject =
-      Math.abs(deltaX) >= distanceThreshold ||
-      (Math.abs(deltaX) >= 24 && Math.abs(velocity) >= 0.5);
-    const direction = deltaX < 0 ? 1 : -1;
+    const velocity = Math.abs(deltaX) / elapsed;
+    const width = viewportRef.current?.clientWidth ?? event.currentTarget.clientWidth;
+    const shouldSwitch =
+      Math.abs(deltaX) >= width * 0.2 ||
+      (Math.abs(deltaX) >= 16 && velocity >= 0.5);
 
-    showProject(
-      shouldChangeProject
-        ? activeProjectIndexRef.current + direction
-        : activeProjectIndexRef.current,
+    if (shouldSwitch) {
+      showProject(activeProjectIndexRef.current + (deltaX < 0 ? 1 : -1));
+    } else {
+      snapTrackTo(activeProjectIndexRef.current);
+    }
+  }
+
+  const activeProject = portfolioProjects[activeProjectIndex];
+  const selectedProject = selectedProjectId
+    ? portfolioProjects.find((project) => project.id === selectedProjectId)
+    : null;
+
+  if (selectedProject) {
+    return (
+      <ProjectDetail
+        project={selectedProject}
+        projectIndex={activeProjectIndex}
+        projectCount={portfolioProjects.length}
+        content={content}
+        backButtonRef={backButtonRef}
+        onBack={closeProjectDetails}
+      />
     );
-
-    window.setTimeout(() => {
-      suppressClickRef.current = false;
-    }, 0);
-  }
-
-  function cancelProjectGesture(event: ReactPointerEvent<HTMLDivElement>) {
-    const gesture = gestureRef.current;
-    gestureRef.current = null;
-    event.currentTarget.classList.remove("is-pointer-active");
-
-    if (
-      gesture &&
-      event.currentTarget.hasPointerCapture(gesture.pointerId)
-    ) {
-      event.currentTarget.releasePointerCapture(gesture.pointerId);
-    }
-
-    queueTrackPosition(0, false);
-  }
-
-  function handleProjectClickCapture(event: ReactMouseEvent<HTMLDivElement>) {
-    if (suppressClickRef.current) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
   }
 
   return (
-    <div className="panel-editorial panel-references">
-      <div className="portfolio-carousel-toolbar">
+    <div className="panel-editorial panel-references reference-overview">
+      <div
+        ref={viewportRef}
+        className="reference-carousel-viewport"
+        role="region"
+        aria-roledescription="carousel"
+        aria-label={content.carouselLabel}
+        tabIndex={0}
+        onKeyDown={handleCarouselKeyDown}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={(event) => finishPointerGesture(event)}
+        onPointerCancel={(event) => finishPointerGesture(event, true)}
+        onClickCapture={(event) => {
+          if (suppressClickRef.current) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+        }}
+      >
+        <div ref={trackRef} className="reference-carousel-track">
+          {portfolioProjects.map((project, index) => {
+            const isActive = index === activeProjectIndex;
+
+            return (
+              <article
+                key={project.id}
+                className={`reference-compact-card${isActive ? " is-active" : ""}`}
+                aria-hidden={!isActive}
+                aria-label={formatMessage(content.slideLabel, {
+                  current: String(index + 1),
+                  total: String(portfolioProjects.length),
+                  project: project.title,
+                })}
+                onClick={(event) => {
+                  if (
+                    isActive &&
+                    !(event.target as HTMLElement).closest("button, a")
+                  ) {
+                    openProjectDetails(index);
+                  }
+                }}
+              >
+                <ProjectPreview project={project} compact priority={index === 0} />
+
+                <div className="reference-compact-content">
+                  <div className="reference-compact-identity">
+                    <p>{project.compact.category}</p>
+                    <h3>{project.title}</h3>
+                    <h4>{project.compact.subtitle}</h4>
+                  </div>
+                  <p className="reference-compact-description">
+                    {project.compact.description}
+                  </p>
+                  <ul
+                    className="reference-compact-technologies"
+                    aria-label={content.technologies}
+                  >
+                    {project.technologies.slice(0, 3).map((technology) => (
+                      <li key={technology}>{technology}</li>
+                    ))}
+                  </ul>
+                  <button
+                    ref={(element) => {
+                      actionRefs.current[index] = element;
+                    }}
+                    type="button"
+                    tabIndex={isActive ? 0 : -1}
+                    onClick={() => openProjectDetails(index)}
+                    aria-label={formatMessage(content.learnMoreAria, {
+                      project: project.title,
+                    })}
+                    className="portfolio-action reference-learn-more"
+                  >
+                    {content.learnMore}
+                  </button>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="reference-carousel-controls">
+        <button
+          type="button"
+          onClick={() => showProject(activeProjectIndex - 1)}
+          aria-label={content.previousProject}
+        >
+          <CarouselArrow direction="previous" />
+        </button>
         <p className="portfolio-carousel-counter" aria-live="polite">
           {String(activeProjectIndex + 1).padStart(2, "0")} / {" "}
           {String(portfolioProjects.length).padStart(2, "0")}
         </p>
-
-        <div
-          className="portfolio-carousel-arrows"
-          aria-label={content.changeProject}
+        <button
+          type="button"
+          onClick={() => showProject(activeProjectIndex + 1)}
+          aria-label={content.nextProject}
         >
-          <button
-            type="button"
-            onClick={() => showProject(activeProjectIndex - 1)}
-            disabled={activeProjectIndex === 0}
-            aria-label={content.previousProject}
-          >
-            <CarouselArrow direction="previous" />
-          </button>
-          <button
-            type="button"
-            onClick={() => showProject(activeProjectIndex + 1)}
-            disabled={activeProjectIndex === portfolioProjects.length - 1}
-            aria-label={content.nextProject}
-          >
-            <CarouselArrow direction="next" />
-          </button>
-        </div>
+          <CarouselArrow direction="next" />
+        </button>
       </div>
 
-      <div
-        ref={viewportRef}
-        className="portfolio-carousel-track"
-        role="region"
-        aria-roledescription={content.carouselDescription}
-        aria-label={content.carouselLabel}
-        tabIndex={0}
-        onKeyDown={handleCarouselKeyDown}
-        onPointerDown={handleProjectPointerDown}
-        onPointerMove={handleProjectPointerMove}
-        onPointerUp={finishProjectGesture}
-        onPointerCancel={cancelProjectGesture}
-        onDragStart={(event) => event.preventDefault()}
-        onClickCapture={handleProjectClickCapture}
-      >
-        <div ref={trackRef} className="portfolio-carousel-track-inner">
-          {portfolioProjects.map((project, index) => (
-            <CaseStudy
-              key={project.id}
-              project={project}
-              index={index}
-              total={portfolioProjects.length}
-              isActive={index === activeProjectIndex}
-              isAdjacent={Math.abs(index - activeProjectIndex) === 1}
-              onShowProject={showProject}
-              content={content}
-              projects={portfolioProjects}
-            />
-          ))}
-        </div>
-      </div>
-
-      <p className="portfolio-carousel-hint" aria-hidden="true">
-        {content.swipeHint}
+      <p className="sr-only" aria-live="polite" aria-atomic="true">
+        {formatMessage(content.projectChanged, {
+          project: activeProject.title,
+        })}
       </p>
     </div>
   );
 }
 
-function CaseStudy({
+function ProjectPreview({
   project,
-  index,
-  total,
-  isActive,
-  isAdjacent,
-  onShowProject,
-  content,
-  projects,
+  compact = false,
+  priority = false,
 }: {
   project: PortfolioProject;
-  index: number;
-  total: number;
-  isActive: boolean;
-  isAdjacent: boolean;
-  onShowProject: (index: number) => void;
-  content: SiteDictionary["panels"]["references"];
-  projects: PortfolioProject[];
+  compact?: boolean;
+  priority?: boolean;
 }) {
   return (
-    <article
-      className="portfolio-project"
-      role="group"
-      aria-roledescription={content.slideDescription}
-      aria-label={formatMessage(content.slideLabel, {
-        current: index + 1,
-        total,
-        name: project.title,
-      })}
-      aria-hidden={!isActive}
+    <div
+      className={`reference-preview reference-preview-${project.previewVariant}${compact ? " reference-preview-compact" : ""}`}
     >
       <div
-        className={`portfolio-preview-stage portfolio-preview-stage-${project.previewVariant}`}
+        className={`reference-browser-frame reference-browser-frame-${project.previewVariant}`}
       >
+        <div className="reference-browser-bar" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+          <p>{project.liveUrl.replace("https://", "")}</p>
+        </div>
         <div
-          className={`portfolio-browser-frame portfolio-browser-frame-${project.previewVariant}`}
+          className={`reference-project-image reference-project-image-${project.imageFit} reference-project-image-${project.previewVariant}`}
         >
-          <div className="portfolio-browser-bar" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-            <p>{project.liveUrl.replace("https://", "")}</p>
-          </div>
-          <div
-            className={`portfolio-project-image portfolio-project-image-${project.imageFit} portfolio-project-image-${project.previewVariant}`}
-          >
-            <Image
-              src={project.image}
-              alt={project.imageAlt}
-              fill
-              sizes={
-                project.previewVariant === "portrait"
-                  ? "(max-width: 767px) 52vw, 290px"
-                  : "(max-width: 767px) calc(100vw - 72px), (max-width: 1199px) 78vw, 900px"
-              }
-              className="portfolio-project-image-media"
-              priority={isActive}
-              loading={isActive ? undefined : isAdjacent ? "eager" : "lazy"}
-              draggable={false}
-              onLoad={(event) => {
-                if (isActive || isAdjacent) {
-                  void event.currentTarget.decode().catch(() => undefined);
-                }
-              }}
-            />
-          </div>
+          <Image
+            src={project.image}
+            alt={project.imageAlt}
+            width={project.imageWidth}
+            height={project.imageHeight}
+            sizes={
+              compact
+                ? project.previewVariant === "portrait"
+                  ? "(max-width: 767px) 46vw, 260px"
+                  : "(max-width: 767px) calc(100vw - 56px), 560px"
+                : project.previewVariant === "portrait"
+                  ? "(max-width: 767px) 62vw, 310px"
+                  : "(max-width: 767px) calc(100vw - 64px), (max-width: 1199px) 52vw, 560px"
+            }
+            className="reference-project-image-media"
+            priority={priority}
+            unoptimized
+            draggable={false}
+          />
         </div>
       </div>
+    </div>
+  );
+}
 
-      <div className="portfolio-project-content">
-        <div className="portfolio-project-identity">
-          <p>{content.caseStudy} · {project.category}</p>
-          <h3>{project.title}</h3>
-          <h4>{project.subtitle}</h4>
+function ProjectDetail({
+  project,
+  projectIndex,
+  projectCount,
+  content,
+  backButtonRef,
+  onBack,
+}: {
+  project: PortfolioProject;
+  projectIndex: number;
+  projectCount: number;
+  content: SiteDictionary["panels"]["references"];
+  backButtonRef: React.MutableRefObject<HTMLButtonElement | null>;
+  onBack: () => void;
+}) {
+  const summaryItems = [
+    {
+      label: content.summary.challenge,
+      value: project.detail.summary.challenge,
+    },
+    {
+      label: content.summary.solution,
+      value: project.detail.summary.solution,
+    },
+    {
+      label: content.summary.outcome,
+      value: project.detail.summary.outcome,
+    },
+  ];
+
+  return (
+    <div className="panel-editorial panel-references reference-detail">
+      <div className="reference-detail-toolbar">
+        <button ref={backButtonRef} type="button" onClick={onBack}>
+          <CarouselArrow direction="previous" />
+          <span>{content.backToProjects}</span>
+        </button>
+        <p>
+          {String(projectIndex + 1).padStart(2, "0")} / {" "}
+          {String(projectCount).padStart(2, "0")} · {project.title}
+        </p>
+      </div>
+
+      <article className="reference-detail-project" aria-labelledby="reference-detail-title">
+        <div className="reference-detail-hero">
+          <ProjectPreview project={project} />
+          <div className="reference-detail-intro">
+            <p>{project.detail.category}</p>
+            <h3 id="reference-detail-title" tabIndex={-1}>
+              {project.title}
+            </h3>
+            <h4>{project.detail.subtitle}</h4>
+            <p className="reference-detail-description">
+              {project.detail.description}
+            </p>
+          </div>
         </div>
 
-        <p className="portfolio-project-description">{project.description}</p>
+        <div className="reference-detail-body">
+          <dl className="reference-project-summary">
+            {summaryItems.map((item) => (
+              <div key={item.label}>
+                <dt>{item.label}</dt>
+                <dd>{item.value}</dd>
+              </div>
+            ))}
+          </dl>
 
-        <dl className="portfolio-project-brief">
-          <div>
-            <dt>{content.targetAudience}</dt>
-            <dd>{project.targetAudience}</dd>
-          </div>
-          <div>
-            <dt>{content.businessGoal}</dt>
-            <dd>{project.businessGoal}</dd>
-          </div>
-        </dl>
-
-        <div id={`${project.id}-details`} className="portfolio-project-details">
-          <section aria-labelledby={`${project.id}-technologies`}>
+          <section
+            className="reference-project-technologies"
+            aria-labelledby={`${project.id}-technologies`}
+          >
             <h5 id={`${project.id}-technologies`}>{content.technologies}</h5>
-            <ul className="portfolio-technology-list">
+            <ul>
               {project.technologies.map((technology) => (
                 <li key={technology}>{technology}</li>
               ))}
             </ul>
           </section>
 
-          <section aria-labelledby={`${project.id}-features`}>
-            <h5 id={`${project.id}-features`}>{content.features}</h5>
-            <ul className="portfolio-feature-list">
-              {project.features.map((feature) => (
-                <li key={feature}>{feature}</li>
-              ))}
-            </ul>
-          </section>
-        </div>
-
-        <div className="portfolio-project-actions">
           <a
             href={project.liveUrl}
             target="_blank"
@@ -971,77 +1766,13 @@ function CaseStudy({
             aria-label={formatMessage(content.liveWebsiteAria, {
               project: project.title,
             })}
-            className="portfolio-action"
-            tabIndex={isActive ? 0 : -1}
+            className="portfolio-action reference-project-action"
           >
             {content.liveWebsite}
           </a>
-          <a
-            href={`#${project.id}-details`}
-            className="portfolio-action"
-            tabIndex={isActive ? 0 : -1}
-          >
-            {content.details}
-          </a>
         </div>
-
-        <nav
-          className="portfolio-project-navigation"
-          aria-label={formatMessage(content.projectNavigation, {
-            project: project.title,
-          })}
-          onPointerDown={(event) => event.stopPropagation()}
-        >
-          <div className="portfolio-project-navigation-row">
-            <button
-              type="button"
-              className="portfolio-project-navigation-button"
-              onClick={() => onShowProject(index - 1)}
-              disabled={index === 0}
-              tabIndex={isActive ? 0 : -1}
-              aria-label={content.previousProject}
-            >
-              <CarouselArrow direction="previous" />
-            </button>
-
-            <p className="portfolio-project-navigation-counter" aria-hidden="true">
-              {String(index + 1).padStart(2, "0")} / {" "}
-              {String(total).padStart(2, "0")}
-            </p>
-
-            <button
-              type="button"
-              className="portfolio-project-navigation-button"
-              onClick={() => onShowProject(index + 1)}
-              disabled={index === total - 1}
-              tabIndex={isActive ? 0 : -1}
-              aria-label={content.nextProject}
-            >
-              <CarouselArrow direction="next" />
-            </button>
-          </div>
-
-          <div
-            className="portfolio-carousel-pagination portfolio-project-navigation-dots"
-            aria-label={content.selectProject}
-          >
-            {projects.map((portfolioProject, projectIndex) => (
-              <button
-                key={portfolioProject.id}
-                type="button"
-                className={projectIndex === index ? "is-active" : undefined}
-                onClick={() => onShowProject(projectIndex)}
-                tabIndex={isActive ? 0 : -1}
-                aria-label={formatMessage(content.showProject, {
-                  project: portfolioProject.title,
-                })}
-                aria-current={projectIndex === index ? "true" : undefined}
-              />
-            ))}
-          </div>
-        </nav>
-      </div>
-    </article>
+      </article>
+    </div>
   );
 }
 

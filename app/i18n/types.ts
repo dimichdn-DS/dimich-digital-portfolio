@@ -16,28 +16,58 @@ export type HeadlineLine = {
 export type LocalizedServicePackage = {
   id: "start" | "business" | "individual";
   name: "START" | "BUSINESS" | "INDIVIDUAL";
-  subtitle: string;
   price: string;
-  description: string;
-  deliveryTime: string;
-  revisions: string;
-  features: string[];
-  visibleFeatures: string[];
-  ctaLabel: string;
+  compact: {
+    subtitle: string;
+    description: string;
+    benefits: [string, string, string];
+    deliveryTime: string;
+  };
+  detail: {
+    subtitle: string;
+    description: string;
+    deliveryTime: string;
+    revisions: string;
+    features: string[];
+    ctaLabel: string;
+  };
   highlighted?: boolean;
 };
 
 export type LocalizedPortfolioProject = {
   id: "steinoutlet" | "aura";
   title: "STEINOutlet" | "AURA";
-  subtitle: string;
-  category: string;
-  description: string;
-  targetAudience: string;
-  businessGoal: string;
+  compact: {
+    subtitle: string;
+    category: string;
+    description: string;
+  };
+  detail: {
+    subtitle: string;
+    category: string;
+    description: string;
+    summary: {
+      challenge: string;
+      solution: string;
+      outcome: string;
+    };
+  };
   imageAlt: string;
-  features: string[];
 };
+
+export type ServiceAreaId =
+  | "websites"
+  | "visibility"
+  | "commerce"
+  | "automation";
+
+export type IndustryGroupId =
+  | "property"
+  | "trades"
+  | "wellness"
+  | "hospitality"
+  | "vehicles"
+  | "professional";
 
 export type SiteDictionary = {
   metadata: {
@@ -85,15 +115,62 @@ export type SiteDictionary = {
     };
     about: {
       lead: string;
-      copy: string;
-      accent: string;
-      factsLabel: string;
-      facts: Array<{ term: string; description: string }>;
+      supporting: string;
+      visualAlt: string;
+      approachHeading: string;
+      principles: Array<{ title: string; description: string }>;
+      servicesHeading: string;
+      services: Array<{ title: string; description: string }>;
+      workflowHeading: string;
+      workflow: Array<{ title: string; description: string }>;
+      cta: {
+        title: string;
+        copy: string;
+        button: string;
+      };
     };
     services: {
-      intro: string;
-      items: Array<{ title: string; description: string }>;
-      sectors: string[];
+      intro: {
+        headline: string;
+        copy: string;
+      };
+      results: [string, string, string];
+      areaLabels: {
+        suitableFor: string;
+        result: string;
+      };
+      areas: Array<{
+        id: ServiceAreaId;
+        title: string;
+        description: string;
+        suitableFor: string;
+        spotlight?: {
+          title: string;
+          copy: string;
+        };
+        capabilities: string[];
+        result: string;
+        note?: string;
+      }>;
+      accordion: {
+        show: string;
+        hide: string;
+      };
+      industries: {
+        heading: string;
+        copy: string;
+        groups: Array<{
+          id: IndustryGroupId;
+          title: string;
+          description: string;
+          examples: string[];
+        }>;
+        note: string;
+      };
+      deliverables: {
+        heading: string;
+        items: string[];
+      };
     };
     offers: {
       packages: LocalizedServicePackage[];
@@ -106,8 +183,12 @@ export type SiteDictionary = {
       slideLabel: string;
       recommended: string;
       includedServices: string;
-      selectPackage: string;
-      showPackage: string;
+      packageChanged: string;
+      learnMore: string;
+      learnMoreAria: string;
+      backToPackages: string;
+      deliveryLabel: string;
+      revisionsLabel: string;
       note: string;
     };
     references: {
@@ -115,22 +196,20 @@ export type SiteDictionary = {
       changeProject: string;
       previousProject: string;
       nextProject: string;
-      carouselDescription: string;
-      slideDescription: string;
       carouselLabel: string;
-      swipeHint: string;
       slideLabel: string;
-      caseStudy: string;
-      targetAudience: string;
-      businessGoal: string;
+      projectChanged: string;
+      learnMore: string;
+      learnMoreAria: string;
+      backToProjects: string;
+      summary: {
+        challenge: string;
+        solution: string;
+        outcome: string;
+      };
       technologies: string;
-      features: string;
       liveWebsite: string;
       liveWebsiteAria: string;
-      details: string;
-      projectNavigation: string;
-      selectProject: string;
-      showProject: string;
     };
     contact: {
       lead: string;
