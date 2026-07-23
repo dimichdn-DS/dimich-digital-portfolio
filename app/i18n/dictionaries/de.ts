@@ -628,11 +628,14 @@ const dictionary = {
           label: "Ihr Name",
           placeholder: "Vor- und Nachname",
           error: "Bitte geben Sie Ihren Namen ein.",
+          maxLengthError: "Der Name darf höchstens 100 Zeichen enthalten.",
         },
         company: {
           label: "Unternehmen oder Branche",
           placeholder: "Zum Beispiel Handwerksbetrieb, Salon, Restaurant",
           error: "Bitte geben Sie Ihr Unternehmen oder Ihre Branche ein.",
+          maxLengthError:
+            "Unternehmen oder Branche dürfen höchstens 150 Zeichen enthalten.",
         },
         service: {
           label: "Was wird benötigt?",
@@ -645,6 +648,8 @@ const dictionary = {
           placeholder:
             "Beschreiben Sie kurz Ihr Unternehmen, Ihr Ziel und was die neue Website erreichen soll.",
           error: "Bitte beschreiben Sie kurz Ihr Projekt.",
+          maxLengthError:
+            "Die Projektbeschreibung darf höchstens 1.200 Zeichen enthalten.",
         },
       },
       services: [

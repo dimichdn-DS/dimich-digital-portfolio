@@ -28,13 +28,15 @@ function BrandWordmark() {
 export default async function LocalePage({
   params,
 }: {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
-  if (!isLocale(params.locale)) {
+  const { locale } = await params;
+
+  if (!isLocale(locale)) {
     notFound();
   }
 
-  const dictionary = await getDictionary(params.locale);
+  const dictionary = await getDictionary(locale);
   const brandLogo = <BrandWordmark />;
   const videoPoster = (
     <picture className="hero-background-poster-picture">
@@ -57,7 +59,7 @@ export default async function LocalePage({
 
   return (
     <TechHero
-      locale={params.locale}
+      locale={locale}
       dictionary={dictionary}
       brandLogo={brandLogo}
       videoPoster={videoPoster}

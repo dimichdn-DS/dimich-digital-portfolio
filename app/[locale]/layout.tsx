@@ -19,14 +19,16 @@ export function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
-  if (!isLocale(params.locale)) {
+  const { locale } = await params;
+
+  if (!isLocale(locale)) {
     notFound();
   }
 
-  const dictionary = await getDictionary(params.locale);
-  const canonicalPath = `/${params.locale}`;
+  const dictionary = await getDictionary(locale);
+  const canonicalPath = `/${locale}`;
 
   return {
     metadataBase: new URL(productionUrl),
@@ -53,19 +55,21 @@ export async function generateMetadata({
   };
 }
 
-export default function LocaleRootLayout({
+export default async function LocaleRootLayout({
   children,
   params,
 }: Readonly<{
   children: React.ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }>) {
-  if (!isLocale(params.locale)) {
+  const { locale } = await params;
+
+  if (!isLocale(locale)) {
     notFound();
   }
 
   return (
-    <html lang={params.locale}>
+    <html lang={locale}>
       <body>{children}</body>
     </html>
   );

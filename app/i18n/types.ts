@@ -217,11 +217,26 @@ export type SiteDictionary = {
       selectedPackage: string;
       selectedPackageOption: string;
       fields: {
-        name: { label: string; placeholder: string; error: string };
-        company: { label: string; placeholder: string; error: string };
+        name: {
+          label: string;
+          placeholder: string;
+          error: string;
+          maxLengthError: string;
+        };
+        company: {
+          label: string;
+          placeholder: string;
+          error: string;
+          maxLengthError: string;
+        };
         service: { label: string; placeholder: string; error: string };
         budget: { label: string };
-        description: { label: string; placeholder: string; error: string };
+        description: {
+          label: string;
+          placeholder: string;
+          error: string;
+          maxLengthError: string;
+        };
       };
       services: string[];
       budgets: string[];

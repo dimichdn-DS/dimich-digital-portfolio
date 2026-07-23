@@ -22,6 +22,20 @@ function fail(message) {
   process.exit(1);
 }
 
+function requireHeader(response, name, expected) {
+  const value = response.headers.get(name);
+
+  if (!value) {
+    fail(`Missing security header: ${name}`);
+  }
+
+  if (expected && !expected.test(value)) {
+    fail(`Unexpected ${name} value: ${value}`);
+  }
+
+  return value;
+}
+
 function findCssAssets(html) {
   const assets = new Set();
   const hrefPattern = /href=["']([^"']+\.css(?:\?[^"']*)?)["']/gi;
@@ -53,6 +67,11 @@ if (!rootLocation || new URL(rootLocation, rootUrl).pathname !== "/de") {
   fail(`Root route does not redirect to /de: ${rootLocation ?? "no location"}`);
 }
 
+requireHeader(rootResponse, "content-security-policy", /default-src 'self'/);
+requireHeader(rootResponse, "strict-transport-security", /max-age=63072000/);
+requireHeader(rootResponse, "x-content-type-options", /^nosniff$/i);
+requireHeader(rootResponse, "x-frame-options", /^DENY$/i);
+
 const localeChecks = [
   ["de", "Websites, die"],
   ["en", "Websites that"],
@@ -79,6 +98,78 @@ if (!page.ok) {
 
 if (!page.text.includes("KPTS WERK")) {
   fail("HTML does not contain KPTS WERK");
+}
+
+const pageResponse = await fetch(baseUrl, { redirect: "manual" });
+const contentSecurityPolicy = requireHeader(
+  pageResponse,
+  "content-security-policy",
+  /default-src 'self'/,
+);
+
+for (const requiredDirective of [
+  "base-uri 'self'",
+  "object-src 'none'",
+  "frame-ancestors 'none'",
+  "form-action 'self'",
+  "script-src 'self' 'unsafe-inline'",
+  "style-src 'self' 'unsafe-inline'",
+  "upgrade-insecure-requests",
+]) {
+  if (!contentSecurityPolicy.includes(requiredDirective)) {
+    fail(`CSP is missing required directive: ${requiredDirective}`);
+  }
+}
+
+if (contentSecurityPolicy.includes("'unsafe-eval'")) {
+  fail("CSP must not allow unsafe-eval");
+}
+
+requireHeader(pageResponse, "strict-transport-security", /max-age=63072000/);
+requireHeader(pageResponse, "x-content-type-options", /^nosniff$/i);
+requireHeader(
+  pageResponse,
+  "referrer-policy",
+  /^strict-origin-when-cross-origin$/i,
+);
+requireHeader(pageResponse, "permissions-policy", /camera=\(\)/);
+requireHeader(pageResponse, "x-frame-options", /^DENY$/i);
+requireHeader(pageResponse, "cross-origin-opener-policy", /^same-origin$/i);
+requireHeader(pageResponse, "cross-origin-resource-policy", /^same-origin$/i);
+
+if (pageResponse.headers.has("x-powered-by")) {
+  fail("X-Powered-By must not be exposed");
+}
+
+for (const sensitivePath of [
+  "/.env",
+  "/.git/config",
+  "/package.json",
+  "/package-lock.json",
+  "/next.config.mjs",
+  "/backup.zip",
+]) {
+  const response = await fetch(`${origin}${sensitivePath}`, {
+    redirect: "manual",
+  });
+
+  if (response.status !== 404) {
+    fail(`${sensitivePath} returned HTTP ${response.status} instead of 404`);
+  }
+}
+
+for (const assetPath of [
+  "/videos/kpts-werk-office-mobile.mp4",
+  "/videos/kpts-werk-office-desktop.mp4",
+  "/icon.svg",
+]) {
+  const response = await fetch(`${origin}${assetPath}`, { method: "HEAD" });
+
+  if (!response.ok) {
+    fail(`${assetPath} returned HTTP ${response.status}`);
+  }
+
+  requireHeader(response, "x-content-type-options", /^nosniff$/i);
 }
 
 const cssAssets = findCssAssets(page.text);
@@ -114,4 +205,7 @@ if (!hasCustomTheme) {
 console.log("HTML OK");
 console.log("CSS OK");
 console.log("Locales OK");
+console.log("Security headers OK");
+console.log("Sensitive paths OK");
+console.log("Static assets OK");
 console.log("Site OK");

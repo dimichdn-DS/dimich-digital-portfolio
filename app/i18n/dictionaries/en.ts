@@ -623,11 +623,14 @@ const dictionary = {
           label: "Your name",
           placeholder: "First and last name",
           error: "Please enter your name.",
+          maxLengthError: "Your name must not exceed 100 characters.",
         },
         company: {
           label: "Business or industry",
           placeholder: "For example trade business, salon or restaurant",
           error: "Please enter your business or industry.",
+          maxLengthError:
+            "Your business or industry must not exceed 150 characters.",
         },
         service: {
           label: "What do you need?",
@@ -640,6 +643,8 @@ const dictionary = {
           placeholder:
             "Briefly describe your business, your goal and what the new website should achieve.",
           error: "Please describe your project briefly.",
+          maxLengthError:
+            "Your project description must not exceed 1,200 characters.",
         },
       },
       services: [

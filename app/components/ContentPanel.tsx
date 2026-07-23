@@ -58,6 +58,12 @@ type BriefingChannel = "whatsapp" | "email";
 
 const CONTACT_EMAIL = "dimich.dn@gmail.com";
 const WHATSAPP_URL = "https://wa.me/49784442215";
+const BRIEFING_LIMITS = {
+  name: 100,
+  company: 150,
+  description: 1200,
+  message: 2400,
+} as const;
 const aboutWideServiceIndexes = new Set([2, 3, 5, 6, 9, 11]);
 
 export function ContentPanel({
@@ -1825,21 +1831,36 @@ function ContactPanel({
     }
 
     const formData = new FormData(form);
+    const toSingleLine = (value: FormDataEntryValue | null) =>
+      String(value ?? "")
+        .replace(/[\r\n]+/g, " ")
+        .trim();
+    const rawService = toSingleLine(formData.get("service"));
+    const rawBudget = toSingleLine(formData.get("budget"));
+    const allowedServices = new Set([
+      ...content.services,
+      ...(selectedService ? [selectedService] : []),
+    ]);
+    const allowedBudgets = new Set(content.budgets);
     const values = {
-      name: String(formData.get("name") ?? "").trim(),
-      company: String(formData.get("company") ?? "").trim(),
-      service: String(formData.get("service") ?? "").trim(),
-      budget: String(formData.get("budget") ?? content.openBudget).trim(),
+      name: toSingleLine(formData.get("name")),
+      company: toSingleLine(formData.get("company")),
+      service: allowedServices.has(rawService) ? rawService : "",
+      budget: allowedBudgets.has(rawBudget) ? rawBudget : content.openBudget,
       description: String(formData.get("description") ?? "").trim(),
     };
     const nextErrors: BriefingErrors = {};
 
     if (!values.name) {
       nextErrors.name = content.fields.name.error;
+    } else if (values.name.length > BRIEFING_LIMITS.name) {
+      nextErrors.name = content.fields.name.maxLengthError;
     }
 
     if (!values.company) {
       nextErrors.company = content.fields.company.error;
+    } else if (values.company.length > BRIEFING_LIMITS.company) {
+      nextErrors.company = content.fields.company.maxLengthError;
     }
 
     if (!values.service) {
@@ -1848,6 +1869,8 @@ function ContactPanel({
 
     if (!values.description) {
       nextErrors.description = content.fields.description.error;
+    } else if (values.description.length > BRIEFING_LIMITS.description) {
+      nextErrors.description = content.fields.description.maxLengthError;
     }
 
     setErrors(nextErrors);
@@ -1884,6 +1907,14 @@ function ContactPanel({
       `${content.message.source}:`,
       content.message.sourceValue,
     ].join("\n");
+    if (message.length > BRIEFING_LIMITS.message) {
+      setErrors({ description: content.fields.description.maxLengthError });
+      requestAnimationFrame(() => {
+        descriptionRef.current?.focus({ preventScroll: false });
+      });
+      return null;
+    }
+
     return message;
   }
 
@@ -1940,6 +1971,7 @@ function ContactPanel({
               name="name"
               type="text"
               required
+              maxLength={BRIEFING_LIMITS.name}
               autoComplete="name"
               placeholder={content.fields.name.placeholder}
               aria-invalid={errors.name ? "true" : undefined}
@@ -1969,6 +2001,7 @@ function ContactPanel({
               name="company"
               type="text"
               required
+              maxLength={BRIEFING_LIMITS.company}
               autoComplete="organization"
               placeholder={content.fields.company.placeholder}
               aria-invalid={errors.company ? "true" : undefined}
@@ -2054,7 +2087,7 @@ function ContactPanel({
               name="description"
               required
               rows={5}
-              maxLength={1200}
+              maxLength={BRIEFING_LIMITS.description}
               placeholder={content.fields.description.placeholder}
               aria-invalid={errors.description ? "true" : undefined}
               aria-describedby={

@@ -757,7 +757,10 @@ function HeroNavigation({
   }
 
   function rememberLocale(nextLocale: Locale) {
-    document.cookie = `${localeCookieName}=${nextLocale}; Path=/; Max-Age=31536000; SameSite=Lax`;
+    const secureAttribute =
+      window.location.protocol === "https:" ? "; Secure" : "";
+
+    document.cookie = `${localeCookieName}=${nextLocale}; Path=/; Max-Age=31536000; SameSite=Lax${secureAttribute}`;
   }
 
   return (
